@@ -41,8 +41,7 @@ $(document).ready(function() {
   var serviveUuid = 0xFFE0
   var characteristicUuid = 0xFFE1
 
-  const terminal = new BluetoothTerminal(serviveUuid,characteristicUuid,
-  '\n','\n');
+  const terminal = new BluetoothTerminal();
 
   // Override `receive` method to log incoming data to the terminal.
   terminal.receive = function(data) {
@@ -74,7 +73,7 @@ $(document).ready(function() {
     currentColors.removeClass('cold');
 
     currentColors.toggleClass(color);
-
+    send('color' + color);
   }
 
   const setSliderOnOff = () => {
@@ -85,11 +84,15 @@ $(document).ready(function() {
       hotBtn.attr('disabled',true);
       coldBtn.attr('disabled',true);
       homeBtn.attr('disabled',true);
+
+      send('power0');
     } else {
       slider.slider( "value", 79 );
       hotBtn.attr('disabled',false);
       coldBtn.attr('disabled',false);
       homeBtn.attr('disabled',false);
+
+      send('power79');
     }
   }
 

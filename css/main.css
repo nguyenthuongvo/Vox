@@ -129,7 +129,6 @@ body {
     .menu-item-btn:disabled,
     .menu-item-btn[disabled] {
         border: 1px solid #999999;
-        background-color: #cccccc;
         color: #666666 !important;
         cursor: not-allowed;
     }
@@ -230,4 +229,5 @@ body {
     position: absolute;
     left: 23px;
     margin-top: 57px;
+    color: #F27405;
 }
