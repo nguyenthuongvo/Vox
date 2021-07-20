@@ -104,19 +104,19 @@ $(document).ready(function() {
 
     switch (btn_id)  {
       case 'connect':
+          connectButton.hide();
+          disconnectButton.show();
           terminal.connect().
           then(() => {
             deviceNameLabel.text(terminal.getDeviceName() ?
             terminal.getDeviceName() : defaultDeviceName);
-            connectButton.hide();
-            disconnectButton.show();
+
           });
         break;
       case 'disconnect':
-          terminal.disconnect().then(() => {
-            connectButton.show();
-            disconnectButton.hide();
-          });
+          connectButton.show();
+          disconnectButton.hide();
+          terminal.disconnect();
           deviceNameLabel.text(defaultDeviceName);
         break;
       case 'power':
