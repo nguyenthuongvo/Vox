@@ -1,167 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Web Ble</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-      
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-        @font-face {
-            font-family: 'Material Icons';
-            font-style: normal;
-            font-weight: 400;
-            src: local('Material Icons'),
-                local('MaterialIcons-Regular'),
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="msapplication-TileColor" content="#2196f3">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    <meta name="theme-color" content="#2196f3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="msapplication-starturl" content="./">
+    <meta name="description"
+          content="Progressive Web Application for serial communication with your own Bluetooth Low Energy (Smart) devices">
 
-        .material-icons {
-            font-family: 'Material Icons';
-            font-weight: normal;
-            font-style: normal;
-            font-size: 24px;  /* Preferred icon size */
-            display: inline-block;
-            line-height: 1;
-            text-transform: none;
-            letter-spacing: normal;
-            word-wrap: normal;
-            white-space: nowrap;
-            direction: ltr;
+    <title>Web Bluetooth Terminal</title>
 
-            /* Support for all WebKit browsers. */
-            -webkit-font-smoothing: antialiased;
-            /* Support for Safari and Chrome. */
-            text-rendering: optimizeLegibility;
-
-            /* Support for Firefox. */
-            -moz-osx-font-smoothing: grayscale;
-
-            /* Support for IE. */
-            font-feature-settings: 'liga';
-        }
-
-        body {
-            background-color: #404040;
-            color: white;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .container {
-            max-width: 414px;
-        }
-
-        .top-header {
-            font-size: 36px;
-            margin: 22px;
-            color: white;
-            font-size: 36px;
-        }
-
-        .main {
-            width: 100%;
-            height: 100%;
-            flex-wrap: wrap;
-            display: flex;
-        }
-
-        .setting {
-            width: 70%;
-        }
-
-            .mt-23 {
-                margin-top: 23px;
-            }
-
-            .mb-47 {
-                margin-bottom: 47px;
-            }
-
-            .ml-23 {
-                padding-left: 22px;
-            }
-
-            .menu-item-btn {
-                height: 79px;
-                width: 79px;
-                border-radius: 50%;
-                background: #404040;
-                box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
-                color: white;
-            }
-
-            .menu-item-label {
-                font-size: 24px;
-                display: inline-block;
-                vertical-align: middle;
-                line-height: normal;
-                margin-left: 10px;
-                color: white;
-                font-weight: 400;
-            }
-
-        .monitor {
-            width: 30%;
-        }
-
-        #slider {
-            height: 454px;
-            width: 86px;
-            box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.25);
-            margin-top: 23px;
-            border-radius: 20px;
-        }
-
-        #slider .ui-slider-handle {
-            width: 94px;
-            visibility: hidden;
-        }
-
-        .ui-widget.ui-widget-content {
-            border: 1px solid #404040;
-        }
-
-        .ui-widget-content { border: 1px solid #ccc; 
-            background-color: #404040;
-        }
-
-        .ui-slider-range-min {
-            background-color: #F27405;
-            border-radius: 20px;
-        }
-
-    </style>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#2196f3">
+    <link rel="shortcut icon" href="icons/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="./css/normalize.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/jquery-ui.css">
+    <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
     <div class="container">
         <div class="top-header">Dashboard</div>
         <div class="main" role="main">
             <div class="setting">
-                <div class="ml-23 mt-23 mb-47">
-                    <button class="menu-item-btn" aria-label="power_settings_new">
+                <div class="menu-item ml-23 mb-47">
+                    <button id="power" type="button" class="menu-item-btn" aria-label="power_settings_new">
                         <span class="material-icons">power_settings_new</span>
                     </button>
                     <span class="menu-item-label">On/Off</span>
                 </div>
     
-                <div class="ml-23 mt-23 mb-47">
-                    <button class="menu-item-btn" aria-label="local_fire_department">
+                <div class="menu-item ml-23 mt-23 mb-47">
+                    <button id="hotmode" disabled type="button" class="menu-item-btn" aria-label="local_fire_department">
                         <span class="material-icons">local_fire_department</span>
                     </button>
                     <span class="menu-item-label">Hot Mode</span>
                   </div>
     
-                  <div class="ml-23 mt-23 mb-47">
-                    <button class="menu-item-btn" aria-label="ac_unit">
+                  <div class="menu-item ml-23 mt-23 mb-47">
+                    <button id="coldmode" disabled type="button" class="menu-item-btn" aria-label="ac_unit">
                       <span class="material-icons">ac_unit</span>
                     </button>
                     <span class="menu-item-label">Cold Mode</span>
                   </div>
     
-                  <div class="ml-23 mt-23 mb-47">
-                    <button class="menu-item-btn" aria-label="home">
+                  <div class="menu-item ml-23 mt-23 mb-25">
+                    <button id="homemode" disabled type="button" class="menu-item-btn" aria-label="home">
                         <span class="material-icons">home</span>
                     </button>
                     <span class="menu-item-label">Home Mode</span>
@@ -172,29 +63,21 @@
                 <div id="slider">
                 </div>
             </div>
+            <div class="footer mt-23 mb-25">
+                <span class="device-label" id="device-name">Terminal</span>
+                <button id="connect" type="button" class="menu-item-btn mr-28" aria-label="bluetooth">
+                    <span class="material-icons">bluetooth</span>
+                </button>
+                <button style="display: none;" id="disconnect" type="button" class="menu-item-btn mr-28" aria-label="bluetooth_connected">
+                    <span class="material-icons">bluetooth_connected</span>
+                </button>
+            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-       $( function() {
-            $( "#slider" ).slider({
-                animate: "fast",
-                orientation: "vertical",
-                range: "min",
-                value: 80,
-                min: 1,
-                max: 100,
-                slide: function() {
-                    // update();
-                },
-                change: function( event, ui ) {
-                    console.log($('#slider').slider('value'));
-                }
-            });
-        } );
-
-    </script>
-
+    <script src="js/BluetoothTerminal.js"></script>
+    <script src="js/Main.js"></script>
+    <script src="js/Companion.js" data-service-worker="sw.js"></script>
 </body>
 </html>
