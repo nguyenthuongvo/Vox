@@ -5,9 +5,9 @@
   "orientation": "any",
   "start_url": "./",
   "scope": "./",
-  "name": "Web Bluetooth Terminal",
-  "short_name": "Web Terminal",
-  "description": "Progressive Web Application for serial communication with your own Bluetooth Low Energy (Smart) devices",
+  "name": "Vox - Web Bluetooth",
+  "short_name": "Vox",
+  "description": "Progressive Web Application for controll ESP32 Bulb",
   "theme_color": "#2196f3",
   "background_color": "#ffffff",
   "icons": [
