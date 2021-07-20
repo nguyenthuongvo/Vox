@@ -104,7 +104,7 @@ $(document).ready(function() {
 
     switch (btn_id)  {
       case 'connect':
-          connectButton.hide();
+          connectButton.css('display',none);
           disconnectButton.show();
           terminal.connect().
           then(() => {
