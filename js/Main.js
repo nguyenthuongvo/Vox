@@ -14,7 +14,6 @@ $(document).ready(function() {
     }
   });
 
-  
   // UI elements.
   const deviceNameLabel = $('#device-name');
   const connectButton =  $('#connect');
