@@ -32,16 +32,19 @@
     font-feature-settings: 'liga';
 }
 
+body, html {height:100%;}
+
 body {
     background-color: #1b1b1b;
     color: white;
     font-family: 'Roboto', sans-serif;
-    width: 100%;
-    height: 100%;
+    overflow: hidden;
 }
 
 .container {
     background-color: #292929;
+    height: 100%;
+    overflow: hidden;
 }
 
 
@@ -78,7 +81,7 @@ body {
 
 .main {
     width: 100%;
-    height: 100%;
+    height: 80%;
     flex-wrap: wrap;
     display: flex;
 }
@@ -87,12 +90,12 @@ body {
     width: 70%;
 }
 
-.mt-1r {
-    margin-top: 1rem;
+.mt-23 {
+    margin-top: 23px;
 }
 
-.mb-1r {
-    margin-bottom: 1rem;
+.mb-47 {
+    margin-bottom: 23px;
 }
 
 .mb-25 {
@@ -161,7 +164,7 @@ body {
 }
 
 #slider {
-    height: 23rem;
+    height: 399px;
     width: 86px;
     box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.25);
     border-radius: 20px;
@@ -187,34 +190,34 @@ body {
 
 .power {
     background-color: #404040;
-    -webkit-transition: background-color 0.4s ease-out;
-    -moz-transition: background-color 0.4s ease-out;
-    -o-transition: background-color 0.4s ease-out;
-    transition: background-color 0.4s ease-out;
+    -webkit-transition: background-color 0.3s ease-out;
+    -moz-transition: background-color 0.3s ease-out;
+    -o-transition: background-color 0.3s ease-out;
+    transition: background-color 0.3s ease-out;
 }
 
 .hot  {
     background-color: #F20505;
-    -webkit-transition: background-color 0.4s ease-out;
-    -moz-transition: background-color 0.4s ease-out;
-    -o-transition: background-color 0.4s ease-out;
-    transition: background-color 0.4s ease-out;
+    -webkit-transition: background-color 0.3s ease-out;
+    -moz-transition: background-color 0.3s ease-out;
+    -o-transition: background-color 0.3s ease-out;
+    transition: background-color 0.3s ease-out;
 }
 
 .cold {
     background-color: #05C7F2;
-    -webkit-transition: background-color 0.4s ease-out;
-    -moz-transition: background-color 0.4s ease-out;
-    -o-transition: background-color 0.4s ease-out;
-    transition: background-color 0.4s ease-out;
+    -webkit-transition: background-color 0.3s ease-out;
+    -moz-transition: background-color 0.3s ease-out;
+    -o-transition: background-color 0.3s ease-out;
+    transition: background-color 0.3s ease-out;
 }
 
 .home  {
     background-color: #F27405;
-    -webkit-transition: background-color 0.4s ease-out;
-    -moz-transition: background-color 0.4s ease-out;
-    -o-transition: background-color 0.4s ease-out;
-    transition: background-color 0.4s ease-out;
+    -webkit-transition: background-color 0.3s ease-out;
+    -moz-transition: background-color 0.3s ease-out;
+    -o-transition: background-color 0.3s ease-out;
+    transition: background-color 0.3s ease-out;
 }
 
 .text-right {
@@ -228,13 +231,13 @@ body {
     justify-content: flex-end;
 }
 
-.mr-2r {
-    margin-right: 2rem;
+.mr-28 {
+    margin-right: 38px;
 }
 
 .device-label {
     position: absolute;
     left: 23px;
-    margin-top: 57px;
+    margin-top: 37px;
     color: #F27405;
 }

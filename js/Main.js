@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $( "#slider" ).slider({
-    animate: "slow",
+    animate: "fast",
     orientation: "vertical",
     range: "min",
     value: 1,
