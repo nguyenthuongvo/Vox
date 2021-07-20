@@ -113,8 +113,8 @@ $(document).ready(function() {
           });
         break;
       case 'disconnect':
-        connectButton.css('display','block');
-        disconnectButton.css('display','none');
+          connectButton.css('display','block');
+          disconnectButton.css('display','none');
           terminal.disconnect();
           deviceNameLabel.text(defaultDeviceName);
         break;
