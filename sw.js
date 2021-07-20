@@ -1,4 +1,4 @@
-importScripts('js/sw-toolbox.js');
+importScripts('js/SW-toolbox.js');
 
 toolbox.precache([
   'css/normalize.css',
