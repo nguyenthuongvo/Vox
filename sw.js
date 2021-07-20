@@ -2,10 +2,10 @@ importScripts('js/sw-toolbox.js');
 
 toolbox.precache([
   'css/normalize.css',
-  'css/styles.css',
+  'css/main.css',
   'js/BluetoothTerminal.js',
-  'js/companion.js',
-  'js/main.js',
+  'js/Companion.js',
+  'js/Main.js',
   'index.html',
 ]);
 

@@ -6,11 +6,9 @@ $(document).ready(function() {
     value: 1,
     min: 1,
     max: 100,
-    slide: function() {
-        // update();
-    },
+    disabled: true,
     change: function( event, ui ) {
-        console.log($('#slider').slider('value'));
+        console.log(slider.slider('value'));
     }
   });
 
@@ -84,12 +82,16 @@ $(document).ready(function() {
       coldBtn.attr('disabled',true);
       homeBtn.attr('disabled',true);
 
+      slider.slider( "disable" );
+
       send('power0');
     } else {
       slider.slider( "value", 79 );
       hotBtn.attr('disabled',false);
       coldBtn.attr('disabled',false);
       homeBtn.attr('disabled',false);
+
+      slider.slider( "enable" );
 
       send('power79');
     }
@@ -106,10 +108,15 @@ $(document).ready(function() {
           then(() => {
             deviceNameLabel.text(terminal.getDeviceName() ?
             terminal.getDeviceName() : defaultDeviceName);
+            connectButton.hide();
+            disconnectButton.show();
           });
         break;
       case 'disconnect':
-          terminal.disconnect();
+          terminal.disconnect().then(() => {
+            connectButton.show();
+            disconnectButton.hide();
+          });
           deviceNameLabel.text(defaultDeviceName);
         break;
       case 'power':
