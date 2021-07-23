@@ -12,7 +12,7 @@
     <meta name="description"
           content="Progressive Web Application for serial communication with your own Bluetooth Low Energy (Smart) devices">
 
-    <title>Web Bluetooth Terminal</title>
+    <title>Vox - Web Bluetooth</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -64,7 +64,16 @@
                 </div>
             </div>
             <div class="footer">
-                <span class="device-label" id="device-name">Vox</span>
+                <div class="device-area">
+                    <svg class="spinner" style="display: none;" width="40px" height="40px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+                     </svg>
+                    <span class="device-label" id="device-name">No device is connected</span>
+                    <span style="font-size: 12px;" class="material-icons">
+                        battery_charging_full
+                    </span>
+                    <span class="battery_level">--</span>
+                </div>
                 <button id="connect" type="button" class="menu-item-btn mr-28" aria-label="bluetooth">
                     <span class="material-icons">bluetooth</span>
                 </button>
@@ -82,6 +91,7 @@
         </div>
 
     </div>
+    <script src="js/PlaybulbCandle.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="js/BluetoothTerminal.js"></script>

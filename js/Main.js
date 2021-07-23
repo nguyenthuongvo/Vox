@@ -1,5 +1,9 @@
 $(document).ready(function() {
-  $( "#slider" ).slider({
+
+  // Helpers.
+  const defaultDeviceName = 'No device is connected';
+
+  const slider = $( "#slider" ).slider({
     animate: "fast",
     orientation: "vertical",
     range: "min",
@@ -12,130 +16,99 @@ $(document).ready(function() {
     }
   });
 
-  // UI elements.
-  const deviceNameLabel = $('#device-name');
-  const connectButton =  $('#connect');
-  const disconnectButton =  $('#disconnect');
-  const menuItem = $('.menu-item-btn');
-  const hotBtn = $('#hotmode');
-  const coldBtn  = $('#coldmode');
-  const homeBtn = $('#homemode');
-  const slider = $('#slider');
-
-  // Helpers.
-  const defaultDeviceName = 'Vox';
-
-  const logToTerminal = (message, type = '') => {
-    console.log(type + ' >> ' + message);
-  };
-
-  // Obtain configured instance.
-  // can work this way as well
-
-  //var serviveUuid = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-  //var characteristicUuid  = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
-
-  var serviveUuid = 0xFFE0
-  var characteristicUuid = 0xFFE1
-
-  const terminal = new BluetoothTerminal();
-
-  // Override `receive` method to log incoming data to the terminal.
-  terminal.receive = function(data) {
-    logToTerminal(data, 'in');
-  };
-
-  // Override default log method to output messages to the terminal and console.
-  terminal._log = function(...messages) {
-    // We can't use `super._log()` here.
-    messages.forEach((message) => {
-      logToTerminal(message);
-      console.log(message); // eslint-disable-line no-console
+  $('#connect').on('click', function() {
+    spinner('block');
+    playbulbCandle.connect().then(() => {
+      return playbulbCandle.getBatteryLevel(handleChangedValue).then(() => {
+        $('#device-name').text(playbulbCandle.getDeviceNameLocal() + " is connected");
+        $('#connect').css('display','none');
+        $('#disconnect').css('display','block');
+        spinner('none');
+      });
+    })
+    .catch(error => {
+      spinner('none');
+      console.error('Argh!', error);
     });
-  };
+  });
 
-  // Implement own send function to log outcoming data to the terminal.
-  const send = (data) => {
-  
-    terminal.send(data).
-        then(() => logToTerminal(data, 'out')).
-        catch((error) => logToTerminal(error));
-  };
 
-  const setSliderColor = (color) => {
-    const currentColors = $('#slider .ui-slider-range-min');
-    currentColors.removeClass('power');
-    currentColors.removeClass('home');
-    currentColors.removeClass('hot');
-    currentColors.removeClass('cold');
+  $('#disconnect').on('click', function() {
+    spinner('block');
+    playbulbCandle.disconnect().then(() => {
+      $('#device-name').text(defaultDeviceName);
+      $('#connect').css('display','block');
+      $('#disconnect').css('display','none');
+      spinner('none');
+    }).catch(error => {
+      spinner('none');
+    })
 
-    currentColors.toggleClass(color);
-    send('color' + color);
-  }
+  });
 
-  const setSliderOnOff = () => {
+  $('#power').on('click', function() {
     const sliderValue =  slider.slider( "value" );
     console.log(sliderValue);
     if (sliderValue > 1) {
       slider.slider( "value", 0 );
-      hotBtn.attr('disabled',true);
-      coldBtn.attr('disabled',true);
-      homeBtn.attr('disabled',true);
-
       slider.slider( "disable" );
+      $('.hotmode, .coldmode, .homemode').attr('disabled',true);
 
-      send('power0');
+
+      // send('power0');
     } else {
       slider.slider( "value", 79 );
-      hotBtn.attr('disabled',false);
-      coldBtn.attr('disabled',false);
-      homeBtn.attr('disabled',false);
-
       slider.slider( "enable" );
+      $('.hotmode, .coldmode, .homemode').attr('disabled',false);
 
-      send('power79');
+      // send('power79');
     }
-  }
+  });
 
+  $('#hotmode').on('click', function() {
+    $('#slider .ui-slider-range-min').removeClass('power home hot cold');
+    currentColors.toggleClass('hot');
+  });
 
-  menuItem.on('click', function() {
-    const btn_id = $(this).attr('id');
-    logToTerminal(btn_id);
+  
+  $('#coldmode').on('click', function() {
+    $('#slider .ui-slider-range-min').removeClass('power home hot cold');
+    currentColors.toggleClass('cold');
+  });
 
-    switch (btn_id)  {
-      case 'connect':
-          terminal.connect().
-          then(() => {
-            deviceNameLabel.text(terminal.getDeviceName() ?
-            terminal.getDeviceName() : defaultDeviceName);
-            connectButton.css('display','none');
-            disconnectButton.css('display','block');
-          });
-        break;
-      case 'disconnect':
-          connectButton.css('display','block');
-          disconnectButton.css('display','none');
-          terminal.disconnect();
-          deviceNameLabel.text(defaultDeviceName);
-        break;
-      case 'power':
-        setSliderOnOff()
-        break;    
-      case 'hotmode':
-        setSliderColor('hot');
-        break;
-      case 'coldmode':
-        setSliderColor('cold');
-        break;
-      case 'homemode':
-        setSliderColor('home');
-        break;
-      default:
-        break;
-    }
-
-
+  $('#homemode').on('click', function() {
+    $('#slider .ui-slider-range-min').removeClass('power home hot cold');
+    currentColors.toggleClass('home');
   });
 
 
-})
+});
+
+function handleDeviceName(deviceName) {
+  logToTerminal(deviceName);
+  $('#device-name').text(deviceName);
+  $('#connect').css('display','none');
+  $('#disconnect').css('display','block');
+}
+
+function handleChangedValue(event) {
+  // console.log(batteryLevel);
+  let value = event.target.value.getUint8(0);
+  $('.battery_level').text(value);
+}
+
+function logToTerminal(message, type = '') {
+  console.log(type + ' >> ' + message);
+};
+
+function spinner(display = 'none') {
+  if (display == 'none') {
+    $('#device-name').css('display', 'block');
+    $('#connect , #disconnect').removeAttr("disabled");
+  } else {
+    $('#device-name').css('display', 'none');
+    $('#connect , #disconnect').attr('disabled',true);
+  }
+
+  $('.spinner').css('display', display);
+}
