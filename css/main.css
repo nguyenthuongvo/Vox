@@ -271,6 +271,19 @@ body {
     color: #F27405;
 }
 
+
+.device-info {
+    position: relative;
+    float: right;
+    margin-top: 5px;
+    margin-right: 35px;
+}
+
+.device-info .battery_level {
+    font-size: 12px;
+}
+
+
 /* Spinner  */
 .spinner {
     animation: rotator 1.4s linear infinite;

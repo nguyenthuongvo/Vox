@@ -1,3 +1,4 @@
+var r = g = b = 255;
 $(document).ready(function() {
 
   // Helpers.
@@ -39,6 +40,7 @@ $(document).ready(function() {
       $('#device-name').text(defaultDeviceName);
       $('#connect').css('display','block');
       $('#disconnect').css('display','none');
+      $('.battery_level').text('--');
       spinner('none');
     }).catch(error => {
       spinner('none');
@@ -52,33 +54,40 @@ $(document).ready(function() {
     if (sliderValue > 1) {
       slider.slider( "value", 0 );
       slider.slider( "disable" );
-      $('.hotmode, .coldmode, .homemode').attr('disabled',true);
+      $('#hotmode, #coldmode, #homemode').attr('disabled',true);
 
 
-      // send('power0');
+      r = 0, g = 0, b = 0;
+      playbulbCandle.setColor(r,g,b);
     } else {
       slider.slider( "value", 79 );
       slider.slider( "enable" );
-      $('.hotmode, .coldmode, .homemode').attr('disabled',false);
-
-      // send('power79');
+      $('#hotmode, #coldmode, #homemode').attr('disabled',false);
+      r = 255, g = 255, b = 255;
+      playbulbCandle.setColor(r,g,b);
     }
   });
 
   $('#hotmode').on('click', function() {
     $('#slider .ui-slider-range-min').removeClass('power home hot cold');
-    currentColors.toggleClass('hot');
+    $('#slider .ui-slider-range-min').toggleClass('hot');
+
+    playbulbCandle.setCandleEffectColor(r,g,b);
   });
 
   
   $('#coldmode').on('click', function() {
     $('#slider .ui-slider-range-min').removeClass('power home hot cold');
-    currentColors.toggleClass('cold');
+    $('#slider .ui-slider-range-min').toggleClass('cold');
+
+    playbulbCandle.setFlashingColor(r,g,b);
   });
 
   $('#homemode').on('click', function() {
     $('#slider .ui-slider-range-min').removeClass('power home hot cold');
-    currentColors.toggleClass('home');
+    $('#slider .ui-slider-range-min').toggleClass('home');
+
+    playbulbCandle.setRainbow();
   });
 
 
