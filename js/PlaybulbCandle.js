@@ -135,7 +135,7 @@
         });
       }
 
-      sendCommand() { // For Testing
+      sendCommand() { // For testing
         let data = new Uint8Array([0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x01, 0x00]);
         return this.device.gatt.getPrimaryService(CANDLE_SERVICE_UUID)
         .then(service => service.getCharacteristic(CANDLE_EFFECT_UUID))
