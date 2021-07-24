@@ -23,9 +23,6 @@
     this._boundHandleDisconnection = this._handleDisconnection.bind(this);
     this._boundHandleCharacteristicValueChanged =
         this._handleCharacteristicValueChanged.bind(this);
-
-    serviceUuid = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-    characteristicUuid  = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     // Configure with specified parameters.
     this.setServiceUuid(serviceUuid);
     this.setCharacteristicUuid(characteristicUuid);
@@ -136,55 +133,26 @@
      
   }
 
-  /**
-   * Send data to the connected device.
-   * @param {string} data - Data
-   * @return {Promise} Promise which will be fulfilled when data will be sent or
-   *                   rejected if something went wrong
-   */
-  send(data) {
-	  
-	  
-    // Convert data to the string using global object.
-    data = String(data || '');
+  setPowerOff() {
+    return this._writeToCharacteristic(this._characteristic, '000000ab');
+  }
 
-    // Return rejected promise immediately if data is empty.
-    if (!data) {
-      return Promise.reject(new Error('Data must be not empty'));
-    }
+  setPowerOn() {
+    return this._writeToCharacteristic(this._characteristic, '000000aa');
+  }
 
-    data += this._sendSeparator;
+  setSolidColor(r, g, b)  {
+    const red = r.toString(16);
+    const green = g.toString(16);
+    const blue = b.toString(16);
+    const solidColor = (red.length ==  1 ? "0" + red : red) + "" + 
+    (green.length ==  1 ? "0" + green: green)  + ""  + 
+    (blue.length ==  1 ? "0" + blue : blue) + "1E"; 
+    return this._writeToCharacteristic(this._characteristic, solidColor);
+  }
 
-    // Split data to chunks by max characteristic value length.
-    const chunks = this.constructor._splitByLength(data,
-        this._maxCharacteristicValueLength);
-
-    // Return rejected promise immediately if there is no connected device.
-    if (!this._characteristic) {
-      return Promise.reject(new Error('There is no connected device'));
-    }
-
-    // Write first chunk to the characteristic immediately.
-    let promise = this._writeToCharacteristic(this._characteristic, chunks[0]);
-
-    // Iterate over chunks if there are more than one of it.
-	
-    for (let i = 1; i < chunks.length; i++) {
-      // Chain new promise.
-      promise = promise.then(() => new Promise((resolve, reject) => {
-        // Reject promise if the device has been disconnected.
-        if (!this._characteristic) {
-          reject(new Error('Device has been disconnected'));
-        }
-
-        // Write chunk to the characteristic and resolve the promise.
-        this._writeToCharacteristic(this._characteristic, chunks[i]).
-            then(resolve).
-            catch(reject);
-      }));
-    }
- 
-    return promise;
+  getDeviceInfo() {
+    return this._writeToCharacteristic(this._characteristic, '00000010');
   }
 
   /**
@@ -252,17 +220,9 @@
     return navigator.bluetooth.requestDevice({
 		
       filters: [{
-        name: 'ESP32'
-      }],
-      optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e',
-      '6e400002-b5a3-f393-e0a9-e50e24dcca9e',
-      '6e400003-b5a3-f393-e0a9-e50e24dcca9e']
-    }).
-	
- 
-	
-	//services: ['c48e6067-5295-48d3-8d5c-0395f61792b1']
-        then((device) => {
+        name: 'TranDecor'
+      }]
+    }).then((device) => {
           this._log('"' + device.name + '" bluetooth device selected');
 
           this._device = device; // Remember device.
@@ -271,22 +231,6 @@
 
           return this._device;
         });
-
-
-    /*
-    return navigator.bluetooth.requestDevice({
-      filters: [{services: [this._serviceUuid]}],
-    }).
-        then((device) => {
-          this._log('"' + device.name + '" bluetooth device selected');
-
-          this._device = device; // Remember device.
-          this._device.addEventListener('gattserverdisconnected',
-              this._boundHandleDisconnection);
-
-          return this._device;
-        });
-   */ 
   }
 
   /**
@@ -381,22 +325,12 @@
    * @private
    */
   _handleCharacteristicValueChanged(event) {
-	  
-    const value = new TextDecoder().decode(event.target.value);
-
-    for (const c of value) {
-      if (c === this._receiveSeparator) {
-        const data = this._receiveBuffer.trim();
-		
-        this._receiveBuffer = '';
-
-        if (data) {
-          this.receive(data);
-        }
-      } else {
-        this._receiveBuffer += c;
-      }
-    }
+    const data = event.target.value;
+    // const str = "";
+    // for ( var i = 0; i < 13; i++) {
+    //   str+= data.getUint8(i).toString() + " ";
+    // }
+    this.receive(data.getUint8(7));
   }
 
   /**
@@ -406,8 +340,11 @@
    * @return {Promise}
    * @private
    */
-  _writeToCharacteristic(characteristic, data) {
-    return characteristic.writeValue(new TextEncoder().encode(data));
+  _writeToCharacteristic(characteristic, hex) {
+    var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
+      return parseInt(h, 16)
+    }))
+    return characteristic.writeValue(typedArray.buffer);
   }
 
   /**

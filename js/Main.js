@@ -1,4 +1,13 @@
 var r = g = b = 255;
+var serviveUuid = 0xFFE0
+var characteristicUuid = 0xFFE1
+const terminal = new BluetoothTerminal(serviveUuid,characteristicUuid,'\n','\n');
+
+terminal.receive = function(data) {
+  $('.battery_level').text(data);
+};
+
+
 $(document).ready(function() {
 
   // Helpers.
@@ -18,14 +27,13 @@ $(document).ready(function() {
   });
 
   $('#connect').on('click', function() {
-    spinner('block');
-    playbulbCandle.connect().then(() => {
-      return playbulbCandle.getBatteryLevel(handleChangedValue).then(() => {
-        $('#device-name').text(playbulbCandle.getDeviceNameLocal() + " is connected");
-        $('#connect').css('display','none');
-        $('#disconnect').css('display','block');
-        spinner('none');
-      });
+    terminal.connect().
+    then(() => {
+      $('#device-name').text(terminal.getDeviceName() + " is connected");
+      $('#connect').css('display','none');
+      $('#disconnect').css('display','block');
+      spinner('none');
+      terminal.getDeviceInfo();
     })
     .catch(error => {
       spinner('none');
@@ -36,16 +44,12 @@ $(document).ready(function() {
 
   $('#disconnect').on('click', function() {
     spinner('block');
-    playbulbCandle.disconnect().then(() => {
-      $('#device-name').text(defaultDeviceName);
-      $('#connect').css('display','block');
-      $('#disconnect').css('display','none');
-      $('.battery_level').text('--');
-      spinner('none');
-    }).catch(error => {
-      spinner('none');
-    })
-
+    terminal.disconnect();
+    $('#device-name').text(defaultDeviceName);
+    $('#connect').css('display','block');
+    $('#disconnect').css('display','none');
+    $('.battery_level').text('--');
+    spinner('none');
   });
 
   $('#power').on('click', function() {
@@ -58,57 +62,38 @@ $(document).ready(function() {
 
 
       r = 0, g = 0, b = 0;
-      playbulbCandle.setColor(r,g,b);
+      terminal.setPowerOff();
     } else {
       slider.slider( "value", 79 );
       slider.slider( "enable" );
       $('#hotmode, #coldmode, #homemode').attr('disabled',false);
       r = 255, g = 255, b = 255;
-      playbulbCandle.setColor(r,g,b);
+      terminal.setPowerOn();
     }
   });
 
   $('#hotmode').on('click', function() {
     $('#slider .ui-slider-range-min').removeClass('power home hot cold');
     $('#slider .ui-slider-range-min').toggleClass('hot');
-
-    playbulbCandle.setCandleEffectColor(r,g,b);
+    terminal.setSolidColor(255,0,0);
   });
 
   
   $('#coldmode').on('click', function() {
     $('#slider .ui-slider-range-min').removeClass('power home hot cold');
     $('#slider .ui-slider-range-min').toggleClass('cold');
-
-    playbulbCandle.setFlashingColor(r,g,b);
+    terminal.setSolidColor(0,255,255);
   });
 
   $('#homemode').on('click', function() {
     $('#slider .ui-slider-range-min').removeClass('power home hot cold');
     $('#slider .ui-slider-range-min').toggleClass('home');
-
-    playbulbCandle.setRainbow();
+    terminal.setSolidColor(242,116,5);
   });
 
 
 });
 
-function handleDeviceName(deviceName) {
-  logToTerminal(deviceName);
-  $('#device-name').text(deviceName);
-  $('#connect').css('display','none');
-  $('#disconnect').css('display','block');
-}
-
-function handleChangedValue(event) {
-  // console.log(batteryLevel);
-  let value = event.target.value.getUint8(0);
-  $('.battery_level').text(value);
-}
-
-function logToTerminal(message, type = '') {
-  console.log(type + ' >> ' + message);
-};
 
 function spinner(display = 'none') {
   if (display == 'none') {
