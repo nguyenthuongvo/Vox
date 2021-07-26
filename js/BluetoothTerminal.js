@@ -295,8 +295,7 @@
           { namePrefix: 'X' },
           { namePrefix: 'Y' },
           { namePrefix: 'Z' }
-        ],
-        optionalServices: 65504
+        ]
     }).then((device) => {
           this._log('"' + device.name + '" bluetooth device selected');
 
