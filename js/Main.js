@@ -6,6 +6,7 @@ var serviveUuid = 65504;
 var characteristicUuid = 65505;
 const terminal = new BluetoothTerminal(serviveUuid,characteristicUuid,'\n','\n');
 
+
 terminal.receive = function(data) {
   isSendData = false;
 
@@ -75,24 +76,28 @@ $(document).ready(function() {
   $('#connect').on('click', function() {
     spinner('block');
     isSendData = false;
-    terminal.connect().
-    then(() => {
+    terminal.connect().then(value => {
       $('#device-name').text(terminal.getDeviceName() + " is connected");
       $('#connect').css('display','none');
       $('#disconnect').css('display','block');
       spinner('none');
-      terminal.getDeviceInfo();
-    })
-    .catch(error => {
+
+      terminal.getDeviceInfo().then(rs => {
+        console.log(rs);
+      }).catch(error => {
+        console.log(error);
+      })
+
+    }).catch(error => {
+      console.log(error);
       spinner('none');
-      console.error('Argh!', error);
     });
+
   });
 
-
-  $('#disconnect').on('click', function() {
+  $('#disconnect').on('click', async function() {
     spinner('block');
-    terminal.disconnect();
+    await terminal.disconnect();
     isSendData = false;
     $('#device-name').text(defaultDeviceName);
     $('#connect').css('display','block');

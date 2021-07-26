@@ -11,7 +11,7 @@
    * @param {string} [receiveSeparator='\n'] - Receive separator
    * @param {string} [sendSeparator='\n'] - Send separator
    */
-  constructor(serviceUuid = 0xFFE0, characteristicUuid = 0xFFE1,
+  constructor(serviceUuid = 65504, characteristicUuid = 65505,
       receiveSeparator = '\n', sendSeparator = '\n') {
     // Used private variables.
     this._receiveBuffer = ''; // Buffer containing not separated data.
@@ -24,8 +24,8 @@
     this._boundHandleCharacteristicValueChanged =
         this._handleCharacteristicValueChanged.bind(this);
     // Configure with specified parameters.
-    this.setServiceUuid(serviceUuid);
-    this.setCharacteristicUuid(characteristicUuid);
+    this.setServiceUuid(65504);
+    this.setCharacteristicUuid(65505);
     this.setReceiveSeparator(receiveSeparator);
     this.setSendSeparator(sendSeparator);
   }
@@ -108,19 +108,46 @@
     return this._connectToDevice(this._device);
   }
 
+    /**
+   * Disconnect from device.
+   * @param {Object} device
+   * @private
+   */
+     _disconnectFromDevice(device) {
+      if (!device) {
+        return;
+      }
+  
+      this._log('Disconnecting from "' + device.name + '" bluetooth device...');
+  
+      device.removeEventListener('gattserverdisconnected',
+          this._boundHandleDisconnection);
+  
+      if (!device.gatt.connected) {
+        this._log('"' + device.name +'" bluetooth device is already disconnected');
+        return;
+      }
+  
+      this._log('"' + device.name + '" bluetooth device disconnected');
+  
+      return device.gatt.disconnect();
+    }
+
   /**
    * Disconnect from the connected device.
    */
   disconnect() {
     this._stopNotifications(this._characteristic).then(value => {
-      this._disconnectFromDevice(this._device);
-
-      if (this._characteristic) {
-        this._characteristic.removeEventListener('characteristicvaluechanged',
-            this._boundHandleCharacteristicValueChanged);
-        this._characteristic = null;
-      }
-      this._device = null;
+      this._disconnectFromDevice(this._device).then(() => {
+        if (this._characteristic) {
+          this._characteristic.removeEventListener('characteristicvaluechanged',
+              this._boundHandleCharacteristicValueChanged);
+          this._characteristic = null;
+        }
+        this._device = null;
+        return;
+      })
+      return;
     })
   }
 
@@ -194,31 +221,6 @@
         });
   }
 
-  /**
-   * Disconnect from device.
-   * @param {Object} device
-   * @private
-   */
-  _disconnectFromDevice(device) {
-    if (!device) {
-      return;
-    }
-
-    this._log('Disconnecting from "' + device.name + '" bluetooth device...');
-
-    device.removeEventListener('gattserverdisconnected',
-        this._boundHandleDisconnection);
-
-    if (!device.gatt.connected) {
-      this._log('"' + device.name +
-          '" bluetooth device is already disconnected');
-      return;
-    }
-
-    device.gatt.disconnect();
-
-    this._log('"' + device.name + '" bluetooth device disconnected');
-  }
 
   /**
    * Request bluetooth device.
@@ -226,75 +228,75 @@
    * @private
    */
   _requestBluetoothDevice() {
-    this._log('Requesting bluetooth device... with service1 ' + this._serviceUuid);
+    this._log('Requesting bluetooth device... with service: ' + this._serviceUuid);
 	
     return navigator.bluetooth.requestDevice({
       filters: [
-        { name: '' },
-        { namePrefix: '0' },
-        { namePrefix: '1' },
-        { namePrefix: '2' },
-        { namePrefix: '3' },
-        { namePrefix: '4' },
-        { namePrefix: '5' },
-        { namePrefix: '6' },
-        { namePrefix: '7' },
-        { namePrefix: '8' },
-        { namePrefix: '9' },
-        { namePrefix: 'a' },
-        { namePrefix: 'b' },
-        { namePrefix: 'c' },
-        { namePrefix: 'd' },
-        { namePrefix: 'e' },
-        { namePrefix: 'f' },
-        { namePrefix: 'g' },
-        { namePrefix: 'h' },
-        { namePrefix: 'i' },
-        { namePrefix: 'j' },
-        { namePrefix: 'k' },
-        { namePrefix: 'l' },
-        { namePrefix: 'm' },
-        { namePrefix: 'n' },
-        { namePrefix: 'o' },
-        { namePrefix: 'p' },
-        { namePrefix: 'q' },
-        { namePrefix: 'r' },
-        { namePrefix: 's' },
-        { namePrefix: 't' },
-        { namePrefix: 'u' },
-        { namePrefix: 'v' },
-        { namePrefix: 'w' },
-        { namePrefix: 'x' },
-        { namePrefix: 'y' },
-        { namePrefix: 'z' },
-        { namePrefix: 'A' },
-        { namePrefix: 'B' },
-        { namePrefix: 'C' },
-        { namePrefix: 'D' },
-        { namePrefix: 'E' },
-        { namePrefix: 'F' },
-        { namePrefix: 'G' },
-        { namePrefix: 'H' },
-        { namePrefix: 'I' },
-        { namePrefix: 'J' },
-        { namePrefix: 'K' },
-        { namePrefix: 'L' },
-        { namePrefix: 'M' },
-        { namePrefix: 'N' },
-        { namePrefix: 'O' },
-        { namePrefix: 'P' },
-        { namePrefix: 'Q' },
-        { namePrefix: 'R' },
-        { namePrefix: 'S' },
-        { namePrefix: 'T' },
-        { namePrefix: 'U' },
-        { namePrefix: 'V' },
-        { namePrefix: 'W' },
-        { namePrefix: 'X' },
-        { namePrefix: 'Y' },
-        { namePrefix: 'Z' }
-      ],
-      optionalServices: [65504]
+          { name: '' },
+          { namePrefix: '0' },
+          { namePrefix: '1' },
+          { namePrefix: '2' },
+          { namePrefix: '3' },
+          { namePrefix: '4' },
+          { namePrefix: '5' },
+          { namePrefix: '6' },
+          { namePrefix: '7' },
+          { namePrefix: '8' },
+          { namePrefix: '9' },
+          { namePrefix: 'a' },
+          { namePrefix: 'b' },
+          { namePrefix: 'c' },
+          { namePrefix: 'd' },
+          { namePrefix: 'e' },
+          { namePrefix: 'f' },
+          { namePrefix: 'g' },
+          { namePrefix: 'h' },
+          { namePrefix: 'i' },
+          { namePrefix: 'j' },
+          { namePrefix: 'k' },
+          { namePrefix: 'l' },
+          { namePrefix: 'm' },
+          { namePrefix: 'n' },
+          { namePrefix: 'o' },
+          { namePrefix: 'p' },
+          { namePrefix: 'q' },
+          { namePrefix: 'r' },
+          { namePrefix: 's' },
+          { namePrefix: 't' },
+          { namePrefix: 'u' },
+          { namePrefix: 'v' },
+          { namePrefix: 'w' },
+          { namePrefix: 'x' },
+          { namePrefix: 'y' },
+          { namePrefix: 'z' },
+          { namePrefix: 'A' },
+          { namePrefix: 'B' },
+          { namePrefix: 'C' },
+          { namePrefix: 'D' },
+          { namePrefix: 'E' },
+          { namePrefix: 'F' },
+          { namePrefix: 'G' },
+          { namePrefix: 'H' },
+          { namePrefix: 'I' },
+          { namePrefix: 'J' },
+          { namePrefix: 'K' },
+          { namePrefix: 'L' },
+          { namePrefix: 'M' },
+          { namePrefix: 'N' },
+          { namePrefix: 'O' },
+          { namePrefix: 'P' },
+          { namePrefix: 'Q' },
+          { namePrefix: 'R' },
+          { namePrefix: 'S' },
+          { namePrefix: 'T' },
+          { namePrefix: 'U' },
+          { namePrefix: 'V' },
+          { namePrefix: 'W' },
+          { namePrefix: 'X' },
+          { namePrefix: 'Y' },
+          { namePrefix: 'Z' }
+        ],
+        optionalServices: [65504]
     }).then((device) => {
           this._log('"' + device.name + '" bluetooth device selected');
 
@@ -322,20 +324,16 @@
 
     return device.gatt.connect().
         then((server) => {
-          this._log('GATT server connected', 'Getting service...');
-
-          return server.getPrimaryService(this._serviceUuid);
+          this._log('GATT server connected\n', 'Getting service...');
+          return server.getPrimaryService(65504);
         }).
         then((service) => {
-          this._log('Service found', 'Getting characteristic...' + this._characteristicUuid);
-
-          return service.getCharacteristic(this._characteristicUuid);
+          this._log('Service found\n', 'Getting characteristic: 65505');
+          return service.getCharacteristic(65505);
         }).
         then((characteristic) => {
           this._log('Characteristic found');
-
           this._characteristic = characteristic; // Remember characteristic.
-
           return this._characteristic;
         });
   }
@@ -348,13 +346,11 @@
    */
   _startNotifications(characteristic) {
     this._log('Starting notifications...');
-
+    characteristic.addEventListener('characteristicvaluechanged',this._boundHandleCharacteristicValueChanged);
     return characteristic.startNotifications().
         then(() => {
           this._log('Notifications started');
-
-          characteristic.addEventListener('characteristicvaluechanged',
-              this._boundHandleCharacteristicValueChanged);
+          return characteristic;
         });
   }
 
