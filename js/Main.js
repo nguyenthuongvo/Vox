@@ -2,8 +2,8 @@ var r = g = b = 255;
 var br = 255;
 var isSendData = false;
 var slider
-var serviveUuid = 0xFFE0;
-var characteristicUuid = 0xFFE1;
+var serviveUuid = 65504;
+var characteristicUuid = 65505;
 const terminal = new BluetoothTerminal(serviveUuid,characteristicUuid,'\n','\n');
 
 terminal.receive = function(data) {
