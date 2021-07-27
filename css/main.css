@@ -92,14 +92,35 @@ body {
 }
 
 .top-header {
+    display: flex;
+    flex-wrap: nowrap;
     font-size: 36px;
     margin-top: 22px;
     margin-left: 22px;
     margin-bottom: 22px;
     color: white;
     font-size: 36px;
-    
 }
+    .top-title {
+        width: 70%;
+    }
+
+    .top-action {
+        width: 30%;
+    }
+
+    .mode-btn {
+        height: 40px;
+        width: 40px;
+        font-size: 14px;
+        border-radius:50%;
+        background: #404040;
+        box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
+        color: white;
+        border-color: #404040;
+        border-style: none;
+        cursor: pointer;
+    }
 
 .main {
     width: 100%;
@@ -110,6 +131,7 @@ body {
 
 .setting {
     width: 70%;
+    /* background-color: white; */
 }
 
 .mt-23 {
@@ -128,6 +150,46 @@ body {
     padding-left: 22px;
 }
 
+button {
+    cursor: pointer;
+}
+
+button:focus {
+    box-shadow: 0px 0px 4px 4px rgba(255, 196, 0, 0.25);
+    color: #F27405;
+}
+
+button:focus {
+    box-shadow: 0px 0px 4px 4px rgba(255, 196, 0, 0.25);
+    color: #F27405;
+}
+
+button:focus  ~ span {
+    color: #F27405;
+}
+
+
+button:hover { 
+    color: #F27405;
+}
+
+button:hover ~ span { 
+    color: #F27405;
+    font-weight: bold; 
+}
+
+button:disabled,
+button[disabled] {
+    border: 1px solid #999999;
+    color: #666666 !important;
+    cursor: not-allowed;
+}
+
+button:disabled,
+button[disabled] ~ span { 
+    color: #666666 !important;
+}
+
     .menu-item-btn {
         height: 79px;
         width: 79px;
@@ -137,40 +199,9 @@ body {
         color: white;
         border-color: #404040;
         border-style: none;
-        cursor: pointer;
     }
 
 
-    .menu-item-btn:focus {
-        box-shadow: 0px 0px 4px 4px rgba(255, 196, 0, 0.25);
-        color: #F27405;
-    }
-
-    .menu-item-btn:focus  ~ span {
-        color: #F27405;
-    }
-
-
-    .menu-item-btn:hover { 
-        color: #F27405;
-    }
-
-    .menu-item-btn:hover ~ span { 
-        color: #F27405;
-        font-weight: bold; 
-    }
-
-    .menu-item-btn:disabled,
-    .menu-item-btn[disabled] {
-        border: 1px solid #999999;
-        color: #666666 !important;
-        cursor: not-allowed;
-    }
-
-    .menu-item-btn:disabled,
-    .menu-item-btn[disabled] ~ span { 
-        color: #666666 !important;
-    }
 
     .menu-item-label {
         font-size: 24px;
@@ -186,7 +217,57 @@ body {
     width: 30%;
     display: flex;
     justify-content: flex-end;
+    /* background-color: tomato; */
 }
+
+
+.color-setting {
+    /* background-color: violet; */
+    text-align: center;
+}
+
+    #color-canvas {
+        margin-bottom: 20px;
+    }
+
+    .preset-button {
+        width: 59px;
+        height: 49px;
+        border-radius: 5px;
+        background-color: #404040;
+        border: 0px;
+        background: #404040;
+        box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
+        color: white;
+    }
+
+    .preset {
+        margin-bottom: 20px;
+    }
+
+    .preset-value {
+        font-size: 22px;
+        height: 49px;
+        width: 49px;
+        padding: 0px;
+        margin: 0px;
+        border-width: 0px;
+        background-color: transparent;
+        text-align: center;
+        color: white;
+    }
+
+    .speed-button {
+        width: 45px;
+        height: 45px;
+        border-radius: 5px;
+        background-color: #404040;
+        border: 0px;
+        background: #404040;
+        box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
+        color: white;
+    }
+
 
 #slider {
     height: 399px;
@@ -249,11 +330,16 @@ body {
     align-items: flex-end;
 }
 
+.mini-icon {
+    font-size: 14px;
+}
+
 .footer {
     display: flex;
     width: 100%;
     flex-wrap: wrap;
     justify-content: flex-end;
+    background-color: yellow;
 }
 
 .mr-28 {
@@ -273,11 +359,48 @@ body {
 
 
 .device-info {
-    position: relative;
-    float: right;
+    display: flex;
+    flex-wrap: nowrap;
     margin-top: 5px;
-    margin-right: 35px;
+    border-bottom: solid 1px black;
+    padding: 7px;
 }
+    .device-led-count {
+        width: 25%;
+    }
+        .icon-led-count{
+            font-size: 12px;
+            margin-left: 16px;
+        }
+
+    .device-name {
+        width: 50%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .device-action {
+        width: 25%;
+    }
+
+        .action-btn {
+            border: transparent;
+            color: white;
+            margin-right: 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            float: right;
+            width: 60px;
+            height: 25px;
+        }
+
+        .action-btn-connected {
+            background-color: blue;
+        }
+
+        .action-btn-disconnected {
+            background-color: orange;
+        }
 
 .device-info .battery_level {
     font-size: 15px;
@@ -321,4 +444,8 @@ body {
    stroke-dashoffset: 187;
    transform:rotate(450deg);
  }
+}
+
+.hidden {
+    display: none;
 }

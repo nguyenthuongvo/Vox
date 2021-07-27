@@ -3,7 +3,7 @@
  * Base on: https://github.com/loginov-rocks/Web-Bluetooth-Terminal/tree/dev
  */
 
- class BluetoothTerminal {
+ class SP110EController {
   /**
    * Create preconfigured Bluetooth Terminal instance.
    * @param {!(number|string)} [serviceUuid=0xFFE0] - Service UUID
@@ -11,23 +11,24 @@
    * @param {string} [receiveSeparator='\n'] - Receive separator
    * @param {string} [sendSeparator='\n'] - Send separator
    */
-  constructor(serviceUuid = 65504, characteristicUuid = 65505,
-      receiveSeparator = '\n', sendSeparator = '\n') {
+  constructor(serviceUuid = 65504, characteristicUuid = 65505) {
     // Used private variables.
-    this._receiveBuffer = ''; // Buffer containing not separated data.
-    this._maxCharacteristicValueLength = 20; // Max characteristic value length.
+    this._RGBSeg = 'RGB'; // Use RGB Seg to map expect color
+    this._ICModel = 'WS2811';
+    this._LEDPixelCount = 0;
     this._device = null; // Device object cache.
     this._characteristic = null; // Characteristic object cache.
 
-    // Bound functions used to add and remove appropriate event handlers.
     this._boundHandleDisconnection = this._handleDisconnection.bind(this);
     this._boundHandleCharacteristicValueChanged =
         this._handleCharacteristicValueChanged.bind(this);
     // Configure with specified parameters.
-    this.setServiceUuid(65504);
-    this.setCharacteristicUuid(65505);
-    this.setReceiveSeparator(receiveSeparator);
-    this.setSendSeparator(sendSeparator);
+    this.setServiceUuid(serviceUuid);
+    this.setCharacteristicUuid(characteristicUuid);
+  }
+
+  setRGBSeg(seg) {
+    this._RGBSeg = seg;
   }
 
   /**
@@ -65,41 +66,6 @@
   }
 
   /**
-   * Set character representing separator for data coming from the connected
-   * device, end of line for example.
-   * @param {string} separator - Receive separator with length equal to one
-   *                             character
-   */
-  setReceiveSeparator(separator) {
-    if (!(typeof separator === 'string' || separator instanceof String)) {
-      throw new Error('Separator type is not a string');
-    }
-
-    if (separator.length !== 1) {
-      throw new Error('Separator length must be equal to one character');
-    }
-
-    this._receiveSeparator = separator;
-  }
-
-  /**
-   * Set string representing separator for data coming to the connected
-   * device, end of line for example.
-   * @param {string} separator - Send separator
-   */
-  setSendSeparator(separator) {
-    if (!(typeof separator === 'string' || separator instanceof String)) {
-      throw new Error('Separator type is not a string');
-    }
-
-    if (separator.length !== 1) {
-      throw new Error('Separator length must be equal to one character');
-    }
-
-    this._sendSeparator = separator;
-  }
-
-  /**
    * Launch Bluetooth device chooser and connect to the selected device.
    * @return {Promise} Promise which will be fulfilled when notifications will
    *                   be started or rejected if something went wrong
@@ -108,45 +74,43 @@
     return this._connectToDevice(this._device);
   }
 
-    /**
+  /**
    * Disconnect from device.
    * @param {Object} device
    * @private
    */
-     _disconnectFromDevice(device) {
-      if (!device) {
-        return;
-      }
-  
-      this._log('Disconnecting from "' + device.name + '" bluetooth device...');
-  
-      device.removeEventListener('gattserverdisconnected',
-          this._boundHandleDisconnection);
-  
-      if (!device.gatt.connected) {
-        this._log('"' + device.name +'" bluetooth device is already disconnected');
-        return;
-      }
-  
-      this._log('"' + device.name + '" bluetooth device disconnected');
-  
-      return device.gatt.disconnect();
+  _disconnectFromDevice(device) {
+    if (!device) {
+      return Promise(device);
     }
+
+    this._log('Disconnecting from "' + device.name + '" bluetooth device...');
+
+    device.removeEventListener('gattserverdisconnected',
+        this._boundHandleDisconnection);
+
+    if (!device.gatt.connected) {
+      this._log('"' + device.name +'" bluetooth device is already disconnected');
+      return Promise(device);
+    }
+
+    this._log('"' + device.name + '" bluetooth device disconnected');
+
+    return device.gatt.disconnect();
+  }
 
   /**
    * Disconnect from the connected device.
    */
   disconnect() {
     this._stopNotifications(this._characteristic).then(value => {
-      this._disconnectFromDevice(this._device).then(() => {
-        if (this._characteristic) {
-          this._characteristic.removeEventListener('characteristicvaluechanged',
-              this._boundHandleCharacteristicValueChanged);
-          this._characteristic = null;
-        }
-        this._device = null;
-        return;
-      })
+      this._disconnectFromDevice(this._device);
+      if (this._characteristic) {
+        this._characteristic.removeEventListener('characteristicvaluechanged',
+            this._boundHandleCharacteristicValueChanged);
+        this._characteristic = null;
+      }
+      this._device = null;
       return;
     })
   }
@@ -170,15 +134,31 @@
   }
 
   setSolidColor(r, g, b)  {
-    const red = r.toString(16);
-    const green = g.toString(16);
-    const blue = b.toString(16);
-    const solidColor = (red.length ==  1 ? "0" + red : red) + "" + 
-    (green.length ==  1 ? "0" + green: green)  + ""  + 
-    (blue.length ==  1 ? "0" + blue : blue) + "1E"; 
+    
+    let red = r.toString(16);
+    red = (red.length ==  1 ? "0" + red: red)  + "" ;
+
+    let green = g.toString(16);
+    green = (green.length ==  1 ? "0" + green: green)  + "" ;
+
+    let blue = b.toString(16);
+    blue = (blue.length ==  1 ? "0" + blue: blue)  + "" ;
+
+    const solidColor = red + green + blue + "1E";
     return this._writeToCharacteristic(this._characteristic, solidColor);
   }
 
+  setPreset(presetValue) {
+    const hexValue = presetValue.toString(16);
+    const command = (hexValue.length ==  1 ? "0" + hexValue : hexValue) + "00002C";
+    return this._writeToCharacteristic(this._characteristic, command);
+  }
+  
+  sendSpeed(speedValue) {
+    const hexValue = speedValue.toString(16);
+    const command = (hexValue.length ==  1 ? "0" + hexValue : hexValue) + "000003";
+    return this._writeToCharacteristic(this._characteristic, command);
+  }
     /**
    * Set LED Strip Brightness
    * @param {Object} value range 0 -255
@@ -296,7 +276,7 @@
           { namePrefix: 'Y' },
           { namePrefix: 'Z' }
         ],
-        optionalServices: [65504,]
+        optionalServices: [this._serviceUuid,this._characteristicUuid]
     }).then((device) => {
           this._log('"' + device.name + '" bluetooth device selected');
 
@@ -324,12 +304,12 @@
 
     return device.gatt.connect().
         then((server) => {
-          this._log('GATT server connected\n', 'Getting service...');
-          return server.getPrimaryService(65504);
+          this._log('GATT server connected\n', 'Getting service...' + this._serviceUuid);
+          return server.getPrimaryService(this._serviceUuid);
         }).
         then((service) => {
-          this._log('Service found\n', 'Getting characteristic: 65505');
-          return service.getCharacteristic(65505);
+          this._log('Service found\n', 'Getting characteristic: ' + this._characteristicUuid);
+          return service.getCharacteristic(this._characteristicUuid);
         }).
         then((characteristic) => {
           this._log('Characteristic found');
@@ -436,5 +416,5 @@
 // Export class as a module to support requiring.
 /* istanbul ignore next */
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = BluetoothTerminal;
+  module.exports = SP110EController;
 }

@@ -1,46 +1,62 @@
 var r = g = b = 255;
 var br = 255;
+var rgbSeg = "RGB";
+var icModel = "";
+var presetValue = 1; //  1 to 120 | 121 is static color
+var speed = 255; // 0 -> 255
 var isSendData = false;
-var slider
+var slider;
 var serviveUuid = 65504;
 var characteristicUuid = 65505;
-const terminal = new BluetoothTerminal(serviveUuid,characteristicUuid,'\n','\n');
+const terminal = new SP110EController(serviveUuid,characteristicUuid,'\n','\n');
 
 
 terminal.receive = function(data) {
   isSendData = false;
+  const enabledStatus = data.getUint8(0);
+  const LEDCount = data.getUint8(7);
+  presetValue = data.getUint8(1);
 
-  this._log("Enabled: " + data.getUint8(0));
-  this._log("Preset: " + data.getUint8(1));
-  this._log("Bright: " + data.getUint8(3));
-  this._log("R: " + data.getUint8(8));
-  this._log("G: " + data.getUint8(9));
-  this._log("B: " + data.getUint8(10));
-  this._log("W: " + data.getUint8(11));
+  this._log("Enabled: " + enabledStatus);
+  this._log("Preset: " + presetValue);
+
+  icModel = IC_MODEL[intToHex(data.getUint8(4))];
+  this._log("IC MODEL: " + icModel);
+
+  rgbSeg = RGB_SEG[intToHex(data.getUint8(5))];
+  this._log("Chanel: " + rgbSeg);
 
   br = data.getUint8(3);
+  let colorArray = [];
   r = data.getUint8(8);
   g = data.getUint8(9);
   b = data.getUint8(10);
+
+  this._log("Bright: " + br);
+  this._log("R: " + r);
+  this._log("G: " + g);
+  this._log("B: " + b);
+  this._log("W: " + data.getUint8(11));
   
-
-  $('.battery_level').text(data.getUint8(7)); // LED COUNT
-  setPowerUI(data.getUint8(0)); // Enabled
-
+  $('.battery_level').text(LEDCount); // LED COUNT
+  setPowerUI(enabledStatus); // Enabled
 
   //Check HOT MODE
-  if (data.getUint8(8) == 255 && data.getUint8(9) == 0 && data.getUint8(10) == 0) {
+  if (r == 255 && g == 0 && b == 0) {
     $('#hotmode').trigger('click');
+    $('#hotmode').focus();
   }
 
   //Check COLD MODE
-  if (data.getUint8(8) == 0 && data.getUint8(9) == 255 && data.getUint8(10) == 255) {
+  if (r == 0 && g == 255 && b == 255) {
     $('#coldmode').trigger('click');
+    $('#coldmode').focus();
   }
 
   //Check HOME MODE
-  if (data.getUint8(8) == 242 && data.getUint8(9) == 116 && data.getUint8(10) == 5) {
+  if (r == 242 && g == 116 && b == 5) {
     $('#homemode').trigger('click');
+    $('#homemode').focus();
   }
 
   // Check Brightness
@@ -61,7 +77,7 @@ $(document).ready(function() {
     animate: "fast",
     orientation: "vertical",
     range: "min",
-    value: 0,
+    value: 200,
     min: 1,
     max: 255,
     disabled: true,
@@ -72,7 +88,7 @@ $(document).ready(function() {
         }
     }
   });
-
+  
   $('#connect').on('click', function() {
     spinner('block');
     isSendData = false;
@@ -141,6 +157,49 @@ $(document).ready(function() {
   });
 
 
+  $('#preset-value').on('change', async function () {
+    presetValue = $(this).val();  
+    if (isSendData) {
+      await terminal.setPreset(presetValue);
+    }
+  });
+
+  $('#preset-previous').on('click', function() {
+    if (presetValue > 1 && presetValue < 121) {
+      presetValue = parseInt(presetValue) - 1;
+    } else {
+      presetValue = 120;
+    }
+    $('#preset-value').val(presetValue);
+    $('#preset-value').trigger('change');
+  });
+
+  $('#preset-next').on('click', function() {
+    if (presetValue > 0 && presetValue < 120) {
+      presetValue = parseInt(presetValue) + 1;
+    } else {
+      presetValue = 1;
+    }
+    $('#preset-value').val(presetValue);
+    $('#preset-value').trigger('change');
+  });
+
+  $('.speed-button').on('click', async function() {
+    var speedId = $(this).val();
+    speed = parseInt((parseInt(speedId) * 255) / 100);
+    console.log(speed);
+    if (isSendData) {
+      await terminal.sendSpeed(speed);
+    }
+  });
+
+  $('.mode-btn').on('click', function() {
+    $('.color-setting').toggleClass('hidden');
+    $('.home-setting').toggleClass('hidden');
+  })
+
+  loadColorPicker();
+
 });
 
 
@@ -168,7 +227,7 @@ async function setPowerUI(isOn = false) {
 
 function spinner(display = 'none') {
   if (display == 'none') {
-    $('#device-name').css('display', 'block');
+    $('#device-name').css('display', '');
     $('#connect , #disconnect').removeAttr("disabled");
   } else {
     $('#device-name').css('display', 'none');
@@ -176,4 +235,64 @@ function spinner(display = 'none') {
   }
 
   $('.spinner').css('display', display);
+}
+
+function loadColorPicker() {
+  var canvas_size = 220;
+  var img = new Image();
+  img.src = '../img/color-wheel.png';
+  img.onload = function() {
+    var canvas = document.getElementById("color-canvas");
+    var context = canvas.getContext('2d');
+    
+    canvas.width = canvas_size * devicePixelRatio;
+    canvas.height = canvas_size * devicePixelRatio;
+    canvas.style.width = canvas_size + "px";
+    canvas.style.height = canvas_size + "px";
+    canvas.addEventListener('click', function(evt) {
+      // Refresh canvas in case user zooms and devicePixelRatio changes.
+      canvas.width = canvas_size * devicePixelRatio;
+      canvas.height = canvas_size * devicePixelRatio;
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+      var rect = canvas.getBoundingClientRect();
+      var x = Math.round((evt.clientX - rect.left) * devicePixelRatio);
+      var y = Math.round((evt.clientY - rect.top) * devicePixelRatio);
+      var data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+  
+      r = data[((canvas.width * y) + x) * 4];
+      g = data[((canvas.width * y) + x) * 4 + 1];
+      b = data[((canvas.width * y) + x) * 4 + 2];
+      
+      // Check user pick outside of image
+
+      if (r == 0 && g == 0 && b == 0) {
+
+      } else {
+        changeColor();
+  
+        context.beginPath();
+        context.arc(x, y + 2, 10 * devicePixelRatio, 0, 2 * Math.PI, false);
+        context.shadowColor = '#333';
+        context.shadowBlur = 4 * devicePixelRatio;
+        context.fillStyle = 'white';
+        context.fill();
+      }
+
+    });
+  
+    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+}
+
+function changeColor() {
+  $('#slider .ui-slider-range-min').css('background-color', `rgba(${r}, ${g}, ${b}, 1)`);
+  if (isSendData) {
+    terminal.setSolidColor(r,g,b);
+  }
+}
+
+function intToHex(value) {
+  let hexValue = value.toString(16);
+  return (hexValue.length == 1 ? "0x0" + hexValue : "0x" + hexValue);
 }

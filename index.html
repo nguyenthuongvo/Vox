@@ -28,48 +28,101 @@
 <body>
     <div class="container">
         <div class="device-info">
-            <span style="font-size: 12px;" class="material-icons">
-                tungsten
-            </span>
-            <span class="battery_level">--</span>
+            <div class="device-led-count">
+                <span class="material-icons icon-led-count">
+                    tungsten
+                </span>
+                <span class="battery_level">--</span>
+            </div>
+            <div class="device-name">
+                <svg class="spinner" style="display: none;" width="15px" height="15px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+                 </svg>
+                <span class="device-label" id="device-name">SP110E</span>
+            </div>
+            <div class="device-action">
+                <button id="connect"  type="button" class="action-btn action-btn-connected" aria-label="bluetooth">
+                    <span class="material-icons">bluetooth</span>
+                </button>
+                <button id="disconnect" style="display: none;"  type="button" class="action-btn action-btn-disconnected" aria-label="bluetooth_connected">
+                    <span class="material-icons">bluetooth_connected</span>
+                </button>
+            </div>
         </div>
-        <div class="top-header">Dashboard</div>
+        <div class="top-header">
+            <div class="top-title">
+                Dashboard
+            </div>
+            <div>
+                <button class="mode-btn" type="button" aria-label="settings">
+                    <span class="material-icons">settings</span>
+                </button>
+            </div>
+        </div>
         <div class="main" role="main">
             <div class="setting">
-                <div class="menu-item ml-23 mb-47">
-                    <button id="power" type="button" class="menu-item-btn" aria-label="power_settings_new">
-                        <span class="material-icons">power_settings_new</span>
-                    </button>
-                    <span class="menu-item-label">On/Off</span>
+
+                <div class="color-setting hidden">
+                    <canvas id="color-canvas"></canvas>
+                    <div>
+                        <span class="material-icons mini-icon">qr_code</span>
+                    </div>
+                    <div class="preset">
+                        <button id="preset-previous" class="preset-button" type="button" aria-label="arrow_back_ios_new">
+                            <span class="material-icons">arrow_back_ios_new</span>
+                        </button>
+                        <input id="preset-value" class="preset-value" value="1">
+                        <button id="preset-next" class="preset-button" type="button" aria-label="arrow_forward_ios">
+                            <span class="material-icons">arrow_forward_ios</span>
+                        </button>
+                    </div>
+                    <span class="material-icons mini-icon">speed</span>
+                    <div class="speed">
+                        <button class="speed-button" value="20">20</button>
+                        <button class="speed-button" value="40">40</button>
+                        <button class="speed-button" value="60">60</button>
+                        <button class="speed-button" value="80">80</button>
+                        <button class="speed-button" value="100">100</button>
+                    </div>
                 </div>
+
+                <div class="home-setting">
+
+                    <div class="menu-item ml-23 mb-47">
+                        <button id="power" type="button" class="menu-item-btn" aria-label="power_settings_new">
+                            <span class="material-icons">power_settings_new</span>
+                        </button>
+                        <span class="menu-item-label">On/Off</span>
+                    </div>
     
-                <div class="menu-item ml-23 mt-23 mb-47">
-                    <button id="hotmode" disabled type="button" class="menu-item-btn" aria-label="local_fire_department">
-                        <span class="material-icons">local_fire_department</span>
-                    </button>
-                    <span class="menu-item-label">Hot Mode</span>
-                  </div>
-    
-                  <div class="menu-item ml-23 mt-23 mb-47">
-                    <button id="coldmode" disabled type="button" class="menu-item-btn" aria-label="ac_unit">
-                      <span class="material-icons">ac_unit</span>
-                    </button>
-                    <span class="menu-item-label">Cold Mode</span>
-                  </div>
-    
-                  <div class="menu-item ml-23 mt-23 mb-25">
-                    <button id="homemode" disabled type="button" class="menu-item-btn" aria-label="home">
-                        <span class="material-icons">home</span>
-                    </button>
-                    <span class="menu-item-label">Home Mode</span>
-                  </div>
-    
+                    <div class="menu-item ml-23 mt-23 mb-47">
+                        <button id="hotmode" disabled type="button" class="menu-item-btn" aria-label="local_fire_department">
+                            <span class="material-icons">local_fire_department</span>
+                        </button>
+                        <span class="menu-item-label">Hot Mode</span>
+                      </div>
+        
+                      <div class="menu-item ml-23 mt-23 mb-47">
+                        <button id="coldmode" disabled type="button" class="menu-item-btn" aria-label="ac_unit">
+                          <span class="material-icons">ac_unit</span>
+                        </button>
+                        <span class="menu-item-label">Cold Mode</span>
+                      </div>
+        
+                      <div class="menu-item ml-23 mt-23 mb-25">
+                        <button id="homemode" disabled type="button" class="menu-item-btn" aria-label="home">
+                            <span class="material-icons">home</span>
+                        </button>
+                        <span class="menu-item-label">Home Mode</span>
+                      </div>
+                </div>
+
             </div>
             <div class="monitor">
                 <div id="slider" class="mr-28">
                 </div>
             </div>
-            <div class="footer">
+            <!-- <div class="footer">
                 <div class="device-area">
                     <svg class="spinner" style="display: none;" width="40px" height="40px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
                         <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
@@ -82,7 +135,7 @@
                 <button id="disconnect" style="display: none;" type="button" class="menu-item-btn mr-28" aria-label="bluetooth_connected">
                     <span class="material-icons">bluetooth_connected</span>
                 </button>
-            </div>
+            </div> -->
         </div>
 
         <div class="pwa-promotion" style="display: none;">
@@ -93,7 +146,8 @@
         </div>
 
     </div>
-    <script src="js/BluetoothTerminal.js?version=2"></script>
+    <script src="js/ControllerMap.js"></script>
+    <script src="js/SP110EController.js?version=2"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="js/Main.js?version=2"></script>
