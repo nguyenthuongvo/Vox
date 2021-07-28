@@ -126,7 +126,23 @@ body {
         cursor: pointer;
         float: right;
         margin-right: 10px;
+        padding: 1px;
     }
+
+.spinner {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(192, 192, 192, 0.5);
+    background-image: url("../img/loading.svg");
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 
 .main {
     width: 100%;
@@ -231,7 +247,10 @@ button[disabled] ~ span {
         background: #404040;
         box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
         color: white;
-        margin: 13px;
+        margin-left: 13px;
+        margin-right: 13px;
+        margin-top: 5px;
+        padding: 2px;
         font-size: 15px;
     }
 
@@ -242,7 +261,7 @@ button[disabled] ~ span {
     .preset-value {
         font-size: 22px;
         height: 39px;
-        width: 39px;
+        width: 59px;
         padding: 0px;
         margin: 0px;
         border-width: 0px;
@@ -261,6 +280,7 @@ button[disabled] ~ span {
         box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
         color: white;
         margin: 4px;
+        padding: 1px;
     }
 
 .colorpicker {
@@ -365,46 +385,6 @@ button[disabled] ~ span {
 
 .device-info .battery_level {
     font-size: 15px;
-}
-
-
-/* Spinner  */
-.spinner {
-    animation: rotator 1.4s linear infinite;
-}
-
-@keyframes rotator {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(270deg); }
-}
-
-.path {
-  stroke-dasharray: 187;
-  stroke-dashoffset: 0;
-  transform-origin: center;
-  animation:
-    dash 1.4s ease-in-out infinite, 
-    colors 5.6s ease-in-out infinite;
-}
-
-@keyframes colors {
-	0% { stroke: #4285F4; }
-	25% { stroke: #DE3E35; }
-	50% { stroke: #F7C223; }
-	75% { stroke: #1B9A59; }
-    100% { stroke: #4285F4; }
-}
-
-@keyframes dash {
- 0% { stroke-dashoffset: 187; }
- 50% {
-   stroke-dashoffset: 47;
-   transform:rotate(135deg);
- }
- 100% {
-   stroke-dashoffset: 187;
-   transform:rotate(450deg);
- }
 }
 
 .hidden {

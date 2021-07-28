@@ -150,9 +150,7 @@
 
   setPreset(presetValue) {
     const hexValue = parseInt(presetValue).toString(16);
-    console.log(hexValue)
     const command = (hexValue.length ==  1 ? "0" + hexValue : hexValue) + "00002C";
-    console.log(command);
     return this._writeToCharacteristic(this._characteristic, command);
   }
 
@@ -191,6 +189,20 @@
     return this._device.name;
   }
 
+  setDeviceName(value)  {
+    let hexValue = "080000BB" + this.convertToHex(value) ;
+    this._log(hexValue);
+    return this._writeToCharacteristic(this._characteristic, hexValue);
+  }
+
+  convertToHex(str) {
+    var hex = '';
+    for(var i=0;i<str.length;i++) {
+        hex += '' + (str.charCodeAt(i).toString(16).length == 1? "0" + str.charCodeAt(i).toString(16) : str.charCodeAt(i).toString(16));
+    }
+    return hex;
+  }
+
   /**
    * Connect to device.
    * @param {Object} device
@@ -198,15 +210,35 @@
    * @private
    */
   _connectToDevice(device) {
+    this._beginReconnect();
     return (device ? Promise.resolve(device) : this._requestBluetoothDevice()).
         then((device) => this._connectDeviceAndCacheCharacteristic(device)).
-        then((characteristic) => this._startNotifications(characteristic)).
+        then((characteristic) => {
+          this._startNotifications(characteristic);
+          this._endReconnect();
+        }).
         catch((error) => {
           this._log(error);
+          this._endReconnect();
           return Promise.reject(error);
         });
   }
 
+  detectBrowser() { 
+    if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ) {
+        return 'Opera';
+    } else if(navigator.userAgent.indexOf("Chrome") != -1 ) {
+        return 'Chrome';
+    } else if(navigator.userAgent.indexOf("Safari") != -1) {
+        return 'Safari';
+    } else if(navigator.userAgent.indexOf("Firefox") != -1 ){
+        return 'Firefox';
+    } else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) {
+        return 'IE';//crap
+    } else {
+        return 0;
+    }
+  } 
 
   /**
    * Request bluetooth device.
@@ -215,7 +247,13 @@
    */
   _requestBluetoothDevice() {
     this._log('Requesting bluetooth device... with service: ' + this._serviceUuid);
-	
+    
+    var optional = {optionalServices: [this._serviceUuid,this._characteristicUuid]};
+
+    if (!this.detectBrowser()) {
+      optional = {};
+    }
+
     return navigator.bluetooth.requestDevice({
       filters: [
           { name: '' },
@@ -282,7 +320,7 @@
           { namePrefix: 'Y' },
           { namePrefix: 'Z' }
         ],
-        optionalServices: [this._serviceUuid,this._characteristicUuid]
+        optional
     }).then((device) => {
           this._log('"' + device.name + '" bluetooth device selected');
 
@@ -364,14 +402,29 @@
    * @private
    */
   _handleDisconnection(event) {
+    this._beginReconnect();
     const device = event.target;
 
     this._log('"' + device.name +
         '" bluetooth device disconnected, trying to reconnect...');
 
     this._connectDeviceAndCacheCharacteristic(device).
-        then((characteristic) => this._startNotifications(characteristic)).
-        catch((error) => this._log(error));
+        then((characteristic) => {
+          this._startNotifications(characteristic);
+          this._endReconnect();
+        }).
+        catch((error) => {
+          this._log(error)
+          this._endReconnect();
+        });
+  }
+
+  _beginReconnect() {
+
+  }
+
+  _endReconnect() {
+
   }
 
   /**
