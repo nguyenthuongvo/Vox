@@ -88,12 +88,22 @@ $(document).ready(function() {
         }
     }
   });
+
+  $('.colorpicker').wheelColorPicker();
+  $('.colorpicker').on('change', function() {
+    const hexColor = $(this).val();
+    console.log(hexColor);
+    if (isSendData) {
+      terminal.setCommand(hexColor + "1E");
+    }
+  })
   
   $('#connect').on('click', function() {
     spinner('block');
     isSendData = false;
     terminal.connect().then(value => {
       $('#device-name').text(terminal.getDeviceName() + " is connected");
+      $('.device-name-input').val(terminal.getDeviceName());
       $('#connect').css('display','none');
       $('#disconnect').css('display','block');
       spinner('none');
@@ -194,11 +204,19 @@ $(document).ready(function() {
   });
 
   $('.mode-btn').on('click', function() {
-    $('.color-setting').toggleClass('hidden');
-    $('.home-setting').toggleClass('hidden');
+    $('.preset-screen').toggleClass('hidden');
+    $('.setting-screen').toggleClass('hidden');
   })
 
-  loadColorPicker();
+  loadIcModel();
+
+  loadRGBSeg();
+
+  loadPreset();
+
+  loadBrightness();
+
+  loadSpeed();
 
 });
 
@@ -237,62 +255,141 @@ function spinner(display = 'none') {
   $('.spinner').css('display', display);
 }
 
-function loadColorPicker() {
-  var canvas_size = 220;
-  var img = new Image();
-  img.src = '../img/color-wheel.png';
-  img.onload = function() {
-    var canvas = document.getElementById("color-canvas");
-    var context = canvas.getContext('2d');
-    
-    canvas.width = canvas_size * devicePixelRatio;
-    canvas.height = canvas_size * devicePixelRatio;
-    canvas.style.width = canvas_size + "px";
-    canvas.style.height = canvas_size + "px";
-    canvas.addEventListener('click', function(evt) {
-      // Refresh canvas in case user zooms and devicePixelRatio changes.
-      canvas.width = canvas_size * devicePixelRatio;
-      canvas.height = canvas_size * devicePixelRatio;
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-      var rect = canvas.getBoundingClientRect();
-      var x = Math.round((evt.clientX - rect.left) * devicePixelRatio);
-      var y = Math.round((evt.clientY - rect.top) * devicePixelRatio);
-      var data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-  
-      r = data[((canvas.width * y) + x) * 4];
-      g = data[((canvas.width * y) + x) * 4 + 1];
-      b = data[((canvas.width * y) + x) * 4 + 2];
-      
-      // Check user pick outside of image
-
-      if (r == 0 && g == 0 && b == 0) {
-
-      } else {
-        changeColor();
-  
-        context.beginPath();
-        context.arc(x, y + 2, 10 * devicePixelRatio, 0, 2 * Math.PI, false);
-        context.shadowColor = '#333';
-        context.shadowBlur = 4 * devicePixelRatio;
-        context.fillStyle = 'white';
-        context.fill();
-      }
-
-    });
-  
-    context.drawImage(img, 0, 0, canvas.width, canvas.height);
-  }
-}
-
-function changeColor() {
-  $('#slider .ui-slider-range-min').css('background-color', `rgba(${r}, ${g}, ${b}, 1)`);
-  if (isSendData) {
-    terminal.setSolidColor(r,g,b);
-  }
-}
-
 function intToHex(value) {
   let hexValue = value.toString(16);
   return (hexValue.length == 1 ? "0x0" + hexValue : "0x" + hexValue);
+}
+
+function loadPreset() {
+  const mapBtn = MY_PRESET;
+  let drawHtml = "";
+
+  for (var index = 0; index < mapBtn.length; index ++) {
+    let line = mapBtn[index]; 
+
+    $.each(line, function(key, value){
+
+      let btnPreset = `<button type="button" data-preset="${key}" class="preset-button">${value}</button>`;
+      drawHtml += btnPreset;
+    })
+
+  }
+
+  $('.my-preset').html(drawHtml);
+
+
+  $('.preset-button').unbind('click');
+  $('.preset-button').on('click', presetBtnClickEvent);
+
+}
+
+function presetBtnClickEvent(event) {
+  let presetCommand = $(this).data('preset');
+  console.log(presetCommand);
+  if (isSendData){
+    terminal.setCommand(presetCommand);
+  }
+}
+
+function loadBrightness() {
+  const mapBtn = MY_BRIGHTNESS;
+  let drawHtml = "";
+
+  for (var index = 0; index < mapBtn.length; index ++) {
+    let line = mapBtn[index]; 
+    $.each(line, function(key, value){
+      let btnPreset = `<button class="small-button brightness-btn" value="${key}">${value}</button>`;
+      drawHtml += btnPreset;
+    })
+
+  }
+
+  $('.brightness').html(drawHtml);
+
+  $('.brightness-btn').unbind('click');
+  $('.brightness-btn').on('click', brightnessBtnClickEvent);
+
+}
+
+function brightnessBtnClickEvent(event) {
+  let value = $(this).val();
+  if (isSendData){
+    terminal.setCommand(value);
+  }
+}
+
+function loadSpeed() {
+  const mapBtn = MY_SPEED;
+  let drawHtml = "";
+
+  for (var index = 0; index < mapBtn.length; index ++) {
+    let line = mapBtn[index]; 
+    $.each(line, function(key, value){
+      let btnPreset = `<button class="small-button speed-btn" value="${key}">${value}</button>`;
+      drawHtml += btnPreset;
+    })
+
+  }
+
+  $('.speed').html(drawHtml);
+
+  $('.speed-btn').unbind('click');
+  $('.speed-btn').on('click', speedBtnClickEvent);
+
+}
+
+function speedBtnClickEvent(event) {
+  let value = $(this).val();
+  console.log(value);
+  if (isSendData){
+    terminal.setCommand(value);
+  }
+}
+
+function loadIcModel() {
+  let drawHtml = "";
+  $.each(IC_MODEL, function(key, value){
+      console.log(key);
+      console.log(value);
+
+    let btnPreset = `<option value="${key}">${value}</option>`;
+    drawHtml += btnPreset;
+  });
+
+  $('.ic-model').html(drawHtml);
+
+  $('.ic-model').unbind('change');
+  $('.ic-model').on('change', icModelChangeEvent);
+}
+
+function icModelChangeEvent() {
+  let value = $(this).val();
+  console.log(value);
+  if (isSendData){
+    // terminal.setCommand(value);
+  }
+}
+
+function loadRGBSeg() {
+  let drawHtml = "";
+  $.each(RGB_SEG, function(key, value){
+      console.log(key);
+      console.log(value);
+
+    let btnPreset = `<option value="${key}">${value}</option>`;
+    drawHtml += btnPreset;
+  });
+
+  $('.rgb-seg').html(drawHtml);
+
+  $('.rgb-seg').unbind('change');
+  $('.rgb-seg').on('change', rgbSegChangeEvent);
+}
+
+function rgbSegChangeEvent() {
+  let value = $(this).val();
+  console.log(value);
+  if (isSendData){
+    // terminal.setCommand(value);
+  }
 }

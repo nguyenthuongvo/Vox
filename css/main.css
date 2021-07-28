@@ -44,7 +44,7 @@ body {
 .container {
     background-color: #292929;
     height: 100%;
-    overflow: hidden;
+    overflow-y: hidden;
 }
 
 
@@ -105,6 +105,10 @@ body {
         width: 70%;
     }
 
+    .top-title-right {
+        width: 30%;
+    }
+
     .top-action {
         width: 30%;
     }
@@ -120,18 +124,45 @@ body {
         border-color: #404040;
         border-style: none;
         cursor: pointer;
+        float: right;
+        margin-right: 10px;
     }
 
 .main {
     width: 100%;
-    height: 80%;
     flex-wrap: wrap;
     display: flex;
 }
 
-.setting {
-    width: 70%;
-    /* background-color: white; */
+.my-preset {
+    width: 100%;
+    text-align: center;
+}
+
+.w-10 {
+    width: 100%;
+}
+
+.w-3 {
+    width: 27%;
+}
+
+.w-7 {
+    width: 73%;
+}
+
+.w-label {
+    margin-top: 12px;
+    /* padding-left: 20px; */
+}
+
+.w-label > span{
+    padding-left: 20px;
+}
+
+.spc-1 {
+    width: 100%;
+    min-height: 10px;
 }
 
 .mt-23 {
@@ -190,55 +221,18 @@ button[disabled] ~ span {
     color: #666666 !important;
 }
 
-    .menu-item-btn {
-        height: 79px;
-        width: 79px;
-        border-radius: 50%;
-        background: #404040;
-        box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
-        color: white;
-        border-color: #404040;
-        border-style: none;
-    }
-
-
-
-    .menu-item-label {
-        font-size: 24px;
-        display: inline-block;
-        vertical-align: middle;
-        line-height: normal;
-        margin-left: 10px;
-        color: white;
-        font-weight: 400;
-    }
-
-.monitor {
-    width: 30%;
-    display: flex;
-    justify-content: flex-end;
-    /* background-color: tomato; */
-}
-
-
-.color-setting {
-    /* background-color: violet; */
-    text-align: center;
-}
-
-    #color-canvas {
-        margin-bottom: 20px;
-    }
 
     .preset-button {
-        width: 59px;
-        height: 49px;
+        width: 69px;
+        height: 69px;
         border-radius: 5px;
         background-color: #404040;
         border: 0px;
         background: #404040;
         box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
         color: white;
+        margin: 13px;
+        font-size: 15px;
     }
 
     .preset {
@@ -247,8 +241,8 @@ button[disabled] ~ span {
 
     .preset-value {
         font-size: 22px;
-        height: 49px;
-        width: 49px;
+        height: 39px;
+        width: 39px;
         padding: 0px;
         margin: 0px;
         border-width: 0px;
@@ -257,7 +251,7 @@ button[disabled] ~ span {
         color: white;
     }
 
-    .speed-button {
+    .small-button {
         width: 45px;
         height: 45px;
         border-radius: 5px;
@@ -266,64 +260,31 @@ button[disabled] ~ span {
         background: #404040;
         box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.25);
         color: white;
+        margin: 4px;
     }
 
-
-#slider {
-    height: 399px;
-    width: 86px;
-    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.25);
-    border-radius: 20px;
+.colorpicker {
+    width: 85%;
+    height: 30px;
+    background-color:#404040;
+    color: white;
+    border-radius: 5px;
 }
 
-#slider .ui-slider-handle {
-    width: 94px;
-    visibility: hidden;
+.custom-input {
+    width: 85%;
+    height: 30px;
+    background-color:#404040;
+    color: white;
+    border-radius: 5px;
 }
 
-.ui-widget.ui-widget-content {
-    border: 1px solid #404040;
-}
-
-.ui-widget-content { border: 1px solid #ccc; 
-    background-color: #404040;
-}
-
-.ui-slider-range-min {
-    border-radius: 20px;
-    background-color: #F27405;
-}
-
-.power {
-    background-color: #404040;
-    -webkit-transition: background-color 0.3s ease-out;
-    -moz-transition: background-color 0.3s ease-out;
-    -o-transition: background-color 0.3s ease-out;
-    transition: background-color 0.3s ease-out;
-}
-
-.hot  {
-    background-color: #F20505;
-    -webkit-transition: background-color 0.3s ease-out;
-    -moz-transition: background-color 0.3s ease-out;
-    -o-transition: background-color 0.3s ease-out;
-    transition: background-color 0.3s ease-out;
-}
-
-.cold {
-    background-color: #05C7F2;
-    -webkit-transition: background-color 0.3s ease-out;
-    -moz-transition: background-color 0.3s ease-out;
-    -o-transition: background-color 0.3s ease-out;
-    transition: background-color 0.3s ease-out;
-}
-
-.home  {
-    background-color: #F27405;
-    -webkit-transition: background-color 0.3s ease-out;
-    -moz-transition: background-color 0.3s ease-out;
-    -o-transition: background-color 0.3s ease-out;
-    transition: background-color 0.3s ease-out;
+.select-custom {
+    width: 88%;
+    height: 35px;
+    background-color:#404040;
+    color: white;
+    border-radius: 2px;
 }
 
 .text-right {

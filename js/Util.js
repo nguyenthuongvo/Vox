@@ -35,4 +35,41 @@ var RGB_SEG = {
   "0x03" : "GBR",
   "0x04" : "BRG",
   "0x05" : "BGR"
-}
+};
+
+var MY_PRESET = [
+  {
+    "ff00001E" : "Red",
+    "00ff001E" : "Green",
+    "0000ff1E" : "Blue",
+    "ffffff1E" : "White"
+  },
+  {
+    "0100002C" : "Rainbow FadeI",
+    "0200002C" : "Rainbow FadeO",
+    "0300002C" : "Rainbow Chasing",
+    "0400002C" : "Rainbow Revert",
+  },
+  {
+    "0500002C" : "Red Chasing",
+    "0600002C" : "Green Chasing",
+    "0700002C" : "Blue Chasing",
+    "0800002C" : "Yellow Chasing"
+  }
+];
+
+var MY_BRIGHTNESS = [
+  {"0000002A" : "0"},
+  {"3300002A" : "25"},
+  {"7d00002A" : "50"},
+  {"be00002A" : "75"},
+  {"ff00002A" : "100"},
+];
+
+var MY_SPEED = [
+  {"00000003" : "0"},
+  {"33000003" : "25"},
+  {"7d000003" : "50"},
+  {"be000003" : "75"},
+  {"ff000003" : "100"}
+];
