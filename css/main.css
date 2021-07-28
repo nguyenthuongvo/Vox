@@ -129,6 +129,10 @@ body {
         padding: 1px;
     }
 
+    .mode-btn > span {
+        margin: 4px;
+    }
+
 .spinner {
     display: none;
     position: absolute;
