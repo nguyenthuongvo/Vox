@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="./css/normalize.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/jquery-ui.css">
+    <link href="./css/wheelcolorpicker.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
@@ -51,91 +52,85 @@
         </div>
         <div class="top-header">
             <div class="top-title">
-                Dashboard
+                My preset
             </div>
-            <div>
+            <div class="top-title-right">
                 <button class="mode-btn" type="button" aria-label="settings">
                     <span class="material-icons">settings</span>
                 </button>
             </div>
         </div>
-        <div class="main" role="main">
-            <div class="setting">
+        <div class="main preset-screen" role="main">
 
-                <div class="color-setting hidden">
-                    <canvas id="color-canvas"></canvas>
-                    <div>
-                        <span class="material-icons mini-icon">qr_code</span>
-                    </div>
-                    <div class="preset">
-                        <button id="preset-previous" class="preset-button" type="button" aria-label="arrow_back_ios_new">
-                            <span class="material-icons">arrow_back_ios_new</span>
-                        </button>
-                        <input id="preset-value" class="preset-value" value="1">
-                        <button id="preset-next" class="preset-button" type="button" aria-label="arrow_forward_ios">
-                            <span class="material-icons">arrow_forward_ios</span>
-                        </button>
-                    </div>
-                    <span class="material-icons mini-icon">speed</span>
-                    <div class="speed">
-                        <button class="speed-button" value="20">20</button>
-                        <button class="speed-button" value="40">40</button>
-                        <button class="speed-button" value="60">60</button>
-                        <button class="speed-button" value="80">80</button>
-                        <button class="speed-button" value="100">100</button>
-                    </div>
-                </div>
-
-                <div class="home-setting">
-
-                    <div class="menu-item ml-23 mb-47">
-                        <button id="power" type="button" class="menu-item-btn" aria-label="power_settings_new">
-                            <span class="material-icons">power_settings_new</span>
-                        </button>
-                        <span class="menu-item-label">On/Off</span>
-                    </div>
-    
-                    <div class="menu-item ml-23 mt-23 mb-47">
-                        <button id="hotmode" disabled type="button" class="menu-item-btn" aria-label="local_fire_department">
-                            <span class="material-icons">local_fire_department</span>
-                        </button>
-                        <span class="menu-item-label">Hot Mode</span>
-                      </div>
-        
-                      <div class="menu-item ml-23 mt-23 mb-47">
-                        <button id="coldmode" disabled type="button" class="menu-item-btn" aria-label="ac_unit">
-                          <span class="material-icons">ac_unit</span>
-                        </button>
-                        <span class="menu-item-label">Cold Mode</span>
-                      </div>
-        
-                      <div class="menu-item ml-23 mt-23 mb-25">
-                        <button id="homemode" disabled type="button" class="menu-item-btn" aria-label="home">
-                            <span class="material-icons">home</span>
-                        </button>
-                        <span class="menu-item-label">Home Mode</span>
-                      </div>
-                </div>
-
+            <div class="my-preset">
+                <button type="button" class="preset-button">Rainbow</button>
+                <button type="button" class="preset-button">Rainbow</button>
+                <button type="button" class="preset-button">Rainbow</button>
+                <button type="button" class="preset-button">Rainbow</button>
             </div>
-            <div class="monitor">
-                <div id="slider" class="mr-28">
-                </div>
+            <div class="spc-1"></div>
+            <div class="w-3 w-label">
+                <span>Brigthness</span>
             </div>
-            <!-- <div class="footer">
-                <div class="device-area">
-                    <svg class="spinner" style="display: none;" width="40px" height="40px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                        <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
-                     </svg>
-                    <span class="device-label" id="device-name">No device is connected</span>
-                </div>
-                <button id="connect" type="button" class="menu-item-btn mr-28" aria-label="bluetooth">
-                    <span class="material-icons">bluetooth</span>
+            <div class="w-7 brightness">
+            </div>
+
+            <div class="spc-1"></div>
+            <div class="w-3 w-label">
+                <span>Speed</span>
+            </div>
+            <div class="w-7 speed">
+            </div>
+
+            <div class="spc-1"></div>
+            <div class="w-3 w-label">
+                <span>Solid Color</span>
+            </div>
+            <div class="w-7">
+                <input type="text" class="colorpicker" data-wcp-preview="true"/>
+            </div>
+
+            <div class="spc-1"></div>
+            <div class="w-3 w-label">
+                <span>Preset</span>
+            </div>
+            <div class="w-7">
+                <button id="preset-previous" class="small-button" type="button" aria-label="arrow_back_ios_new">
+                    <span class="material-icons">arrow_back_ios_new</span>
                 </button>
-                <button id="disconnect" style="display: none;" type="button" class="menu-item-btn mr-28" aria-label="bluetooth_connected">
-                    <span class="material-icons">bluetooth_connected</span>
+                <input id="preset-value" class="preset-value" value="1">
+                <button id="preset-next" class="small-button" type="button" aria-label="arrow_forward_ios">
+                    <span class="material-icons">arrow_forward_ios</span>
                 </button>
-            </div> -->
+            </div>
+
+        </div>
+
+        <div class="main setting-screen hidden" role="main">
+            <div class="w-3 w-label">
+                <span>Name</span>
+            </div>
+            <div class="w-7">
+                <input id="preset-value" class="custom-input device-name-input" value="">
+            </div>
+            <div class="spc-1"></div>
+            <div class="w-3 w-label">
+                <span>RGB Seg</span>
+            </div>
+            <div class="w-7">
+                <select class="select-custom rgb-seg">
+                    
+                </select>
+            </div>
+            <div class="spc-1"></div>
+            <div class="w-3 w-label">
+                <span>IC Model</span>
+            </div>
+            <div class="w-7">
+                <select class="select-custom ic-model">
+                    
+                </select>
+            </div>
         </div>
 
         <div class="pwa-promotion" style="display: none;">
@@ -146,10 +141,11 @@
         </div>
 
     </div>
-    <script src="js/ControllerMap.js"></script>
+    <script src="js/Util.js"></script>
     <script src="js/SP110EController.js?version=2"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="js/jquery.wheelcolorpicker.js"></script>
     <script src="js/Main.js?version=2"></script>
 </body>
 </html>

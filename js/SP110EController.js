@@ -149,9 +149,15 @@
   }
 
   setPreset(presetValue) {
-    const hexValue = presetValue.toString(16);
+    const hexValue = parseInt(presetValue).toString(16);
+    console.log(hexValue)
     const command = (hexValue.length ==  1 ? "0" + hexValue : hexValue) + "00002C";
+    console.log(command);
     return this._writeToCharacteristic(this._characteristic, command);
+  }
+
+  setCommand(code) {
+    this._writeToCharacteristic(this._characteristic, code);
   }
   
   sendSpeed(speedValue) {
