@@ -10,9 +10,18 @@ var serviveUuid = 65504;
 var characteristicUuid = 65505;
 const terminal = new SP110EController(serviveUuid,characteristicUuid,'\n','\n');
 
+terminal._beginReconnect = function() {
+  spinner('block');
+}
+
+terminal._endReconnect = function() {
+  spinner('none');
+}
 
 terminal.receive = function(data) {
   isSendData = false;
+  spinner('block');
+
   const enabledStatus = data.getUint8(0);
   const LEDCount = data.getUint8(7);
   presetValue = data.getUint8(1);
@@ -20,11 +29,17 @@ terminal.receive = function(data) {
   this._log("Enabled: " + enabledStatus);
   this._log("Preset: " + presetValue);
 
-  icModel = IC_MODEL[intToHex(data.getUint8(4))];
-  this._log("IC MODEL: " + icModel);
+  const icModelCode = intToHex(data.getUint8(4));
+  icModel = IC_MODEL[icModelCode];
 
-  rgbSeg = RGB_SEG[intToHex(data.getUint8(5))];
+  this._log("IC MODEL: " + icModel);
+  $('.ic-model').val(icModelCode);
+
+  const regSegCode = intToHex(data.getUint8(5));
+  rgbSeg = RGB_SEG[regSegCode];
+
   this._log("Chanel: " + rgbSeg);
+  $('.rgb-seg').val(regSegCode);
 
   br = data.getUint8(3);
   let colorArray = [];
@@ -64,9 +79,8 @@ terminal.receive = function(data) {
 
   //Set isSendData for webbluetooth send value
   isSendData = true;
-
+  spinner('none');
 };
-
 
 $(document).ready(function() {
 
@@ -92,31 +106,27 @@ $(document).ready(function() {
   $('.colorpicker').wheelColorPicker();
   $('.colorpicker').on('change', function() {
     const hexColor = $(this).val();
-    console.log(hexColor);
+    terminal._log(hexColor);
     if (isSendData) {
       terminal.setCommand(hexColor + "1E");
     }
   })
   
   $('#connect').on('click', function() {
-    spinner('block');
     isSendData = false;
     terminal.connect().then(value => {
       $('#device-name').text(terminal.getDeviceName() + " is connected");
       $('.device-name-input').val(terminal.getDeviceName());
       $('#connect').css('display','none');
       $('#disconnect').css('display','block');
-      spinner('none');
-
       terminal.getDeviceInfo().then(rs => {
-        console.log(rs);
+        terminal._log(rs);
       }).catch(error => {
-        console.log(error);
+        terminal._log(error);
       })
 
     }).catch(error => {
-      console.log(error);
-      spinner('none');
+      terminal._log(error);
     });
 
   });
@@ -197,7 +207,7 @@ $(document).ready(function() {
   $('.speed-button').on('click', async function() {
     var speedId = $(this).val();
     speed = parseInt((parseInt(speedId) * 255) / 100);
-    console.log(speed);
+    terminal._log(speed);
     if (isSendData) {
       await terminal.sendSpeed(speed);
     }
@@ -206,6 +216,15 @@ $(document).ready(function() {
   $('.mode-btn').on('click', function() {
     $('.preset-screen').toggleClass('hidden');
     $('.setting-screen').toggleClass('hidden');
+  })
+
+  $('.device-name-input').on('change', function() {
+    let value = $(this).val();
+    if (isSendData) {
+      terminal.setDeviceName(value).then(() => {
+        $('#device-name').text(value + " is connected");
+      })
+    }
   })
 
   loadIcModel();
@@ -222,7 +241,7 @@ $(document).ready(function() {
 
 
 async function setPowerUI(isOn = false) {
-  console.log('isSendData: ' + isSendData);
+  terminal._log('isSendData: ' + isSendData);
   if (!isOn) {
     slider.slider( "disable" );
     $('#hotmode, #coldmode, #homemode').attr('disabled',true);
@@ -285,7 +304,7 @@ function loadPreset() {
 
 function presetBtnClickEvent(event) {
   let presetCommand = $(this).data('preset');
-  console.log(presetCommand);
+  terminal._log(presetCommand);
   if (isSendData){
     terminal.setCommand(presetCommand);
   }
@@ -340,7 +359,7 @@ function loadSpeed() {
 
 function speedBtnClickEvent(event) {
   let value = $(this).val();
-  console.log(value);
+  terminal._log(value);
   if (isSendData){
     terminal.setCommand(value);
   }
@@ -349,8 +368,8 @@ function speedBtnClickEvent(event) {
 function loadIcModel() {
   let drawHtml = "";
   $.each(IC_MODEL, function(key, value){
-      console.log(key);
-      console.log(value);
+      terminal._log(key);
+      terminal._log(value);
 
     let btnPreset = `<option value="${key}">${value}</option>`;
     drawHtml += btnPreset;
@@ -364,17 +383,16 @@ function loadIcModel() {
 
 function icModelChangeEvent() {
   let value = $(this).val();
-  console.log(value);
   if (isSendData){
-    // terminal.setCommand(value);
+    terminal.setCommand(value + "1C");
   }
 }
 
 function loadRGBSeg() {
   let drawHtml = "";
   $.each(RGB_SEG, function(key, value){
-      console.log(key);
-      console.log(value);
+      terminal._log(key);
+      terminal._log(value);
 
     let btnPreset = `<option value="${key}">${value}</option>`;
     drawHtml += btnPreset;
@@ -388,8 +406,8 @@ function loadRGBSeg() {
 
 function rgbSegChangeEvent() {
   let value = $(this).val();
-  console.log(value);
   if (isSendData){
-    // terminal.setCommand(value);
+    terminal.setCommand(value + "3C");
   }
 }
+
