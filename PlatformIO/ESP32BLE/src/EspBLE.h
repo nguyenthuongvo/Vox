@@ -13,25 +13,17 @@
 
 BLEServer* pServer = NULL;
 
-// Optional Services
-#define BatteryService BLEUUID((uint16_t)0x180F) 
-BLECharacteristic BatteryLevelCharacteristic(BLEUUID((uint16_t)0x2A19), BLECharacteristic::PROPERTY_READ  | BLECharacteristic::PROPERTY_WRITE  | BLECharacteristic::PROPERTY_NOTIFY);
-BLEDescriptor BatteryLevelDescriptor(BLEUUID((uint16_t)0x2901));
 
+// SPService
+#define SPService BLEUUID((uint16_t)0xFFE0) 
 
-// CandleService
-#define CandleService BLEUUID((uint16_t)0xFF02) 
-BLECharacteristic DeviceNameCharacteristic(BLEUUID((uint16_t)0xFFFF), BLECharacteristic::PROPERTY_READ  | BLECharacteristic::PROPERTY_WRITE  | BLECharacteristic::PROPERTY_NOTIFY);
-BLEDescriptor DeviceNameDescriptor(BLEUUID((uint16_t)0x2901));
-
-BLECharacteristic ColorCharacteristic(BLEUUID((uint16_t)0xFFFC), BLECharacteristic::PROPERTY_READ  | BLECharacteristic::PROPERTY_WRITE  | BLECharacteristic::PROPERTY_NOTIFY);
-BLEDescriptor ColorDescriptor(BLEUUID((uint16_t)0x2901));
-
-BLECharacteristic EffectCharacteristic(BLEUUID((uint16_t)0xFFFB), BLECharacteristic::PROPERTY_READ  | BLECharacteristic::PROPERTY_WRITE  | BLECharacteristic::PROPERTY_NOTIFY);
-BLEDescriptor EffectDescriptor(BLEUUID((uint16_t)0x2901));
+BLECharacteristic MainCharacteristic(BLEUUID((uint16_t)0xFFE1), BLECharacteristic::PROPERTY_READ  | BLECharacteristic::PROPERTY_WRITE  | BLECharacteristic::PROPERTY_NOTIFY);
+BLEDescriptor MainDescriptor(BLEUUID((uint16_t)0x2901));
 
 // End services
 
+byte rec[4];
+byte theArrays[] = { 0xFF, 0x01, 0x79 , 0x7D, 0x8A, 0x03 , 0x02, 0x00, 0x09 , 0xFF, 0x00, 0x00 , 0x00 };
 
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -44,60 +36,35 @@ class MyServerCallbacks : public BLEServerCallbacks {
     }
 };
 
-class DeviceNameCharacteristicCallbacks: public BLECharacteristicCallbacks {
+
+class MainCharacteristicCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *characteristic) {
       std::string value = characteristic->getValue();
 
       if (value.length() > 0) {
-        Serial.print("Device Name: ");
-
-        for (int i = 0; i < value.length(); i++) {
-          Serial.print(value[i]);
-          if (i < value.length() - 1) Serial.print(",");
-        }
-
-        Serial.println("");
-      }
-    }
-};
-
-class ColorCharacteristicCallbacks: public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *characteristic) {
-      std::string value = characteristic->getValue();
-
-      if (value.length() > 0) {
-        Serial.print("Color: ");
+        Serial.print("Command: ");
 
         for (int i = 0; i < value.length(); i++) {
           Serial.print((uint8_t)value[i]);
-          if (i < value.length() - 1) Serial.print(",");
+          rec[i] = (uint8_t)value[i];
+          if (i < value.length() - 1) Serial.print("-");
         }
 
         Serial.println("");
+
       }
+
+    theArrays[0] = (byte) (rec[2] | ((rec[0] << 1) & 254 & 105) | rec[1]); // Checksum device
+
+    MainCharacteristic.setValue(theArrays, 13);
+    MainCharacteristic.notify();
+    Serial.println("Send byte array success");
+
     }
 };
-
-class EffecctCharacteristicCallbacks: public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *characteristic) {
-      std::string value = characteristic->getValue();
-
-      if (value.length() > 0) {
-        Serial.print("Effect: ");
-
-        for (int i = 0; i < value.length(); i++) {
-          Serial.print((uint8_t)value[i]);
-          if (i < value.length() - 1) Serial.print(",");
-        }
-
-        Serial.println("");
-      }
-    }
-};
-
 
 void SetupBluetooth() {
-  BLEDevice::init("JS LED Strip");
+  BLEDevice::init("SP110EFake");
   
   // Create the BLE Server
   // Optional Services: Battery Services
@@ -105,53 +72,21 @@ void SetupBluetooth() {
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
-  // Create the BLE Service
-  BLEService *pBatteryService = pServer->createService(BatteryService);
-  
-  pBatteryService->addCharacteristic(&BatteryLevelCharacteristic);
-  BatteryLevelDescriptor.setValue("Percentage 0 - 100");
-  BatteryLevelCharacteristic.addDescriptor(&BatteryLevelDescriptor);
-  BatteryLevelCharacteristic.addDescriptor(new BLE2902());
-
-  pServer->getAdvertising()->addServiceUUID(BatteryService);
-  pBatteryService->start();
-
-  // End the BLE Service
-
-
 
   // Create the BLE Service
   // Main Services: JS LED Strip Services
 
-  BLEService *pCandleService = pServer->createService(CandleService);
+  BLEService *pSPService = pServer->createService(SPService);
   // Create BLE Characteristics
 
-  // DeviceName
-  pCandleService ->addCharacteristic(&DeviceNameCharacteristic);
-  DeviceNameDescriptor.setValue("Change device name");
-  DeviceNameCharacteristic.addDescriptor(&DeviceNameDescriptor);
-  DeviceNameCharacteristic.addDescriptor(new BLE2902());
-  DeviceNameCharacteristic.setCallbacks(new DeviceNameCharacteristicCallbacks());
-  pServer->getAdvertising()->addServiceUUID(CandleService);
-
   // Color
-  pCandleService ->addCharacteristic(&ColorCharacteristic);
-  ColorDescriptor.setValue("Set color bulb");
-  ColorCharacteristic.addDescriptor(&ColorDescriptor);
-  ColorCharacteristic.addDescriptor(new BLE2902());
-  ColorCharacteristic.setCallbacks(new ColorCharacteristicCallbacks());
-  pServer->getAdvertising()->addServiceUUID(CandleService);
-
-  // Effect
-  pCandleService ->addCharacteristic(&EffectCharacteristic);
-  EffectDescriptor.setValue("Set effect bulb");
-  EffectCharacteristic.addDescriptor(&EffectDescriptor);
-  EffectCharacteristic.addDescriptor(new BLE2902());
-  EffectCharacteristic.setCallbacks(new EffecctCharacteristicCallbacks());
-  pServer->getAdvertising()->addServiceUUID(CandleService);
+  pSPService ->addCharacteristic(&MainCharacteristic);
+  MainCharacteristic.addDescriptor(&MainDescriptor);
+  MainCharacteristic.setCallbacks(new MainCharacteristicCallbacks());
+  pServer->getAdvertising()->addServiceUUID(SPService);
 
   //
-  pCandleService->start();
+  pSPService->start();
 
   // Start advertising
   pServer->getAdvertising()->start();

@@ -9,6 +9,7 @@ var slider;
 var serviveUuid = 65504;
 var characteristicUuid = 65505;
 const terminal = new SP110EController(serviveUuid,characteristicUuid,'\n','\n');
+terminal.printLog(false);
 
 terminal._beginReconnect = function() {
   spinner('block');
@@ -19,41 +20,53 @@ terminal._endReconnect = function() {
 }
 
 terminal.receive = function(data) {
+
+  let u8b = data.buffer; // array buffer
+  let u8 = new Uint8Array(u8b);
+  let pureData = Array.from(u8);
+
+  this._log(pureData);
+  //  this._log("BYTES COUNT: " + );
+
+  const enabledStatus = pureData[0];
+  presetValue = pureData[1];
+  speed = pureData[2];
+  br = pureData[3];
+  const icModelCode = intToHex(pureData[4]);
+  const regSegCode = intToHex(pureData[5]);
+  r = pureData[8];
+  g = pureData[9];
+  b = pureData[10];
+
   isSendData = false;
   spinner('block');
 
-  const enabledStatus = data.getUint8(0);
-  const LEDCount = data.getUint8(7);
-  presetValue = data.getUint8(1);
-
+  const LEDCount =  parseInt(pureData[6].toString().padStart(2,'0') + pureData[7].toString().padStart(2,'0'),16);
+  
   this._log("Enabled: " + enabledStatus);
   this._log("Preset: " + presetValue);
 
-  const icModelCode = intToHex(data.getUint8(4));
-  icModel = IC_MODEL[icModelCode];
+  
+  $('#preset-value').val(presetValue);
 
+  icModel = IC_MODEL[icModelCode];
   this._log("IC MODEL: " + icModel);
   $('.ic-model').val(icModelCode);
 
-  const regSegCode = intToHex(data.getUint8(5));
   rgbSeg = RGB_SEG[regSegCode];
-
   this._log("Chanel: " + rgbSeg);
   $('.rgb-seg').val(regSegCode);
 
-  br = data.getUint8(3);
-  let colorArray = [];
-  r = data.getUint8(8);
-  g = data.getUint8(9);
-  b = data.getUint8(10);
 
   this._log("Bright: " + br);
   this._log("R: " + r);
   this._log("G: " + g);
   this._log("B: " + b);
-  this._log("W: " + data.getUint8(11));
+  this._log("W: " + pureData[11]);
   
-  $('.battery_level').text(LEDCount); // LED COUNT
+  this._log("LED Count" + LEDCount);
+  $('.led-length-input').val(LEDCount);
+  $('.led-length-label').text(LEDCount); // LED COUNT
   setPowerUI(enabledStatus); // Enabled
 
   //Check HOT MODE
@@ -216,7 +229,7 @@ $(document).ready(function() {
   $('.mode-btn').on('click', function() {
     $('.preset-screen').toggleClass('hidden');
     $('.setting-screen').toggleClass('hidden');
-  })
+  });
 
   $('.device-name-input').on('change', function() {
     let value = $(this).val();
@@ -224,6 +237,17 @@ $(document).ready(function() {
       terminal.setDeviceName(value).then(() => {
         $('#device-name').text(value + " is connected");
       })
+    }
+  });
+
+  $('.led-length-input').on('change',function() {
+    let value = $(this).val();
+    value = intToHex(value, 4);
+    if (isSendData) {
+      this._log(value + "682D")
+      terminal.setCommand( value + "682D").then(() => {
+        $('.led-length-label').val(value);
+      });
     }
   })
 
@@ -274,9 +298,24 @@ function spinner(display = 'none') {
   $('.spinner').css('display', display);
 }
 
-function intToHex(value) {
-  let hexValue = value.toString(16);
-  return (hexValue.length == 1 ? "0x0" + hexValue : "0x" + hexValue);
+function intToHex(value, output = 2) {
+  
+  let outValue = "";
+
+  if (output == 2) {
+    outValue =  parseInt(value).toString(16).padStart(2, '0');
+  }
+
+  if (output == 4) {
+    if ( parseInt(value) < 256) {
+      outValue = parseInt(value).toString().padStart(4, '0');
+    } else {
+      outValue = parseInt(value).toString(16).padStart(4, '0');
+    }
+  }
+
+  terminal._log(`intoHex[${output}] : ${outValue}`);
+  return outValue;
 }
 
 function loadPreset() {
@@ -368,9 +407,6 @@ function speedBtnClickEvent(event) {
 function loadIcModel() {
   let drawHtml = "";
   $.each(IC_MODEL, function(key, value){
-      terminal._log(key);
-      terminal._log(value);
-
     let btnPreset = `<option value="${key}">${value}</option>`;
     drawHtml += btnPreset;
   });
@@ -384,16 +420,13 @@ function loadIcModel() {
 function icModelChangeEvent() {
   let value = $(this).val();
   if (isSendData){
-    terminal.setCommand(value + "1C");
+    terminal.setCommand(value + "00001C");
   }
 }
 
 function loadRGBSeg() {
   let drawHtml = "";
   $.each(RGB_SEG, function(key, value){
-      terminal._log(key);
-      terminal._log(value);
-
     let btnPreset = `<option value="${key}">${value}</option>`;
     drawHtml += btnPreset;
   });
@@ -407,7 +440,8 @@ function loadRGBSeg() {
 function rgbSegChangeEvent() {
   let value = $(this).val();
   if (isSendData){
-    terminal.setCommand(value + "3C");
+    this._log(value + "00003C");
+    terminal.setCommand(value + "00003C");
   }
 }
 

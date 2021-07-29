@@ -15,7 +15,7 @@
     // Used private variables.
     this._RGBSeg = 'RGB'; // Use RGB Seg to map expect color
     this._ICModel = 'WS2811';
-    this._LEDPixelCount = 0;
+    this._isPrintLog = false;
     this._device = null; // Device object cache.
     this._characteristic = null; // Characteristic object cache.
 
@@ -25,6 +25,10 @@
     // Configure with specified parameters.
     this.setServiceUuid(serviceUuid);
     this.setCharacteristicUuid(characteristicUuid);
+  }
+
+  printLog(flag) {
+    this._isPrintLog = flag;
   }
 
   setRGBSeg(seg) {
@@ -155,7 +159,7 @@
   }
 
   setCommand(code) {
-    this._writeToCharacteristic(this._characteristic, code);
+    return this._writeToCharacteristic(this._characteristic, code);
   }
   
   sendSpeed(speedValue) {
@@ -457,7 +461,9 @@
    * @private
    */
   _log(...messages) {
-    console.log(...messages); // eslint-disable-line no-console
+    if (this._isPrintLog) {
+      console.log(...messages);
+    }
   }
 
   /**
