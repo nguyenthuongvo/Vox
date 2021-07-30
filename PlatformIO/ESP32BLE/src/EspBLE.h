@@ -23,7 +23,7 @@ BLEDescriptor MainDescriptor(BLEUUID((uint16_t)0x2901));
 // End services
 
 byte rec[4];
-byte theArrays[] = { 0xFF, 0x01, 0x79 , 0x7D, 0x8A, 0x03 , 0x02, 0x00, 0x09 , 0xFF, 0x00, 0x00 , 0x00 };
+byte dataArrays[] = { 0xFF, 0x01, 0x79 , 0x7D, 0x8A, 0x03 , 0x02, 0x00, 0x09 , 0xFF, 0x00, 0x00 , 0x00 };
 
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -54,9 +54,9 @@ class MainCharacteristicCallbacks: public BLECharacteristicCallbacks {
 
       }
 
-    theArrays[0] = (byte) (rec[2] | ((rec[0] << 1) & 254 & 105) | rec[1]); // Checksum device
+    dataArrays[0] = (byte) (rec[2] | ((rec[0] << 1) & 254 & 105) | rec[1]); // Checksum device
 
-    MainCharacteristic.setValue(theArrays, 13);
+    MainCharacteristic.setValue(dataArrays, 13);
     MainCharacteristic.notify();
     Serial.println("Send byte array success");
 
