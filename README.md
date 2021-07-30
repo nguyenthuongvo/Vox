@@ -20,6 +20,7 @@
 ### 1. Command
 #### All command send to SP110E has 4 bytes, 3 bytes is data and last byte is command.  
 4 bytes must be HEX code `NO SPACE BETWEEN` command.
+(Video) How to test command: https://www.youtube.com/watch?v=IN22t3pKAs0 
 
 | Command  | Command  | Data  |  Return/Response |
 | :------------ |:---------------:|--------:|  -----:|
