@@ -119,3 +119,6 @@ dataArrays[0] = (byte) (rec[2] | ((rec[0] << 1) & 254 & 105) | rec[1]); // Check
 ### 5. Troubleshoot request device function error on Bluefly browser
 Bluefly bowser raises **requestDevice** error if include **optionalServices** so we need  to remove it.
 
+
+## Reference  
+https://gist.github.com/mbullington/37957501a07ad065b67d4e8d39bfe012
