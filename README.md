@@ -1,4 +1,5 @@
 # Vox - Web Bluetooth - Remote SP110E LED controller 
+# Demo link: https://nguyenthuongvo.github.io/Vox
 - Work well on Chrome (Linux), Bluefly (iOS)
 - It works on Chrome (Windows, Android), but I didn't  test it
 - On Linux/Windows, you have to turn **Experimental Web Platform features** and **Use the new permissions backend for Web Bluetooth** in `chrome://flags`
