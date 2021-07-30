@@ -1,3 +1,4 @@
+![image info](./img/sp110e.JPG)
 # Vox - Web Bluetooth - Remote SP110E LED controller 
 # Demo link: https://nguyenthuongvo.github.io/Vox
 - Work well on Chrome (Linux), Bluefly (iOS)
