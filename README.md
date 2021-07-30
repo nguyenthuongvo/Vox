@@ -19,7 +19,7 @@
 # Technical document
 ### 1. Command
 #### All command send to SP110E has 4 bytes, 3 bytes is data and last byte is command.  
-4 bytes must be HEX code `NO SPACE BETWEEN` command.
+4 bytes must be HEX code `NO SPACE BETWEEN` command.  
 (Video) How to test command: https://www.youtube.com/watch?v=IN22t3pKAs0 
 
 | Command  | Command  | Data  |  Return/Response |
@@ -103,7 +103,7 @@ Something I need debug command (like led num) so I had to fake SP100E firmware t
 The difficult is CHECKSUM, Have to pass checksum for receiving led num command or static color command.
 
 Example:
-Source code location: ***PlatformIO/ESP32BLE***
+Source code location: ***PlatformIO/ESP32BLE***  
 When ESP32 receive data:
 ```sh
 D7 F3 A1 D5
