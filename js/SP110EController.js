@@ -1,6 +1,5 @@
 /**
- * Bluetooth Terminal class.
- * Base on: https://github.com/loginov-rocks/Web-Bluetooth-Terminal/tree/dev
+ * SP110E controller class
  */
 
  class SP110EController {
@@ -12,17 +11,12 @@
    * @param {string} [sendSeparator='\n'] - Send separator
    */
   constructor(serviceUuid = 65504, characteristicUuid = 65505) {
-    // Used private variables.
-    this._RGBSeg = 'RGB'; // Use RGB Seg to map expect color
-    this._ICModel = 'WS2811';
     this._isPrintLog = false;
-    this._device = null; // Device object cache.
-    this._characteristic = null; // Characteristic object cache.
-
+    this._device = null; 
+    this._characteristic = null;
     this._boundHandleDisconnection = this._handleDisconnection.bind(this);
     this._boundHandleCharacteristicValueChanged =
         this._handleCharacteristicValueChanged.bind(this);
-    // Configure with specified parameters.
     this.setServiceUuid(serviceUuid);
     this.setCharacteristicUuid(characteristicUuid);
   }
@@ -31,9 +25,6 @@
     this._isPrintLog = flag;
   }
 
-  setRGBSeg(seg) {
-    this._RGBSeg = seg;
-  }
 
   /**
    * Set number or string representing service UUID used.
@@ -129,14 +120,29 @@
      
   }
 
+  /**
+   * 
+   * @returns Promise()
+   */
   setPowerOff() {
     return this._writeToCharacteristic(this._characteristic, '000000ab');
   }
 
+  /**
+   * 
+   * @returns Promise
+   */
   setPowerOn() {
     return this._writeToCharacteristic(this._characteristic, '000000aa');
   }
 
+  /**
+   * 
+   * @param {byte} r 
+   * @param {byte} g 
+   * @param {byte} b 
+   * @returns 
+   */
   setSolidColor(r, g, b)  {
     
     let red = r.toString(16);
@@ -152,16 +158,32 @@
     return this._writeToCharacteristic(this._characteristic, solidColor);
   }
 
+  /**
+   * 
+   * @param {bye} presetValue range 1-120
+   * @returns 
+   */
   setPreset(presetValue) {
     const hexValue = parseInt(presetValue).toString(16);
     const command = (hexValue.length ==  1 ? "0" + hexValue : hexValue) + "00002C";
     return this._writeToCharacteristic(this._characteristic, command);
   }
 
+  /**
+   * 
+   * @param {string} code command has 4 bytes.
+   * Example "000000aa" Turn on
+   * @returns promise()
+   */
   setCommand(code) {
     return this._writeToCharacteristic(this._characteristic, code);
   }
   
+  /**
+   * 
+   * @param {byte} speedValue range 1 -255
+   * @returns Promise()
+   */
   sendSpeed(speedValue) {
     const hexValue = speedValue.toString(16);
     const command = (hexValue.length ==  1 ? "0" + hexValue : hexValue) + "000003";
@@ -177,6 +199,10 @@
     return this._writeToCharacteristic(this._characteristic, command);
   }
 
+  /**
+   * 
+   * @returns DataViewer include 12 bytes
+   */
   getDeviceInfo() {
     return this._writeToCharacteristic(this._characteristic, '00000010');
   }
@@ -193,12 +219,23 @@
     return this._device.name;
   }
 
+  /**
+   * 
+   * @param {string} value max lenght is 8
+   * @returns Promise()
+   */
   setDeviceName(value)  {
     let hexValue = "080000BB" + this.convertToHex(value) ;
     this._log(hexValue);
     return this._writeToCharacteristic(this._characteristic, hexValue);
   }
 
+
+  /**
+   * 
+   * @param {string} str
+   * @returns Hex
+   */
   convertToHex(str) {
     var hex = '';
     for(var i=0;i<str.length;i++) {
@@ -228,6 +265,10 @@
         });
   }
 
+  /**
+   * 
+   * @returns Browser name or 0 if not found
+   */
   detectBrowser() { 
     if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ) {
         return 'Opera';
