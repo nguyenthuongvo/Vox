@@ -244,7 +244,6 @@ $(document).ready(function() {
     let value = $(this).val();
     value = intToHex(value, 4);
     if (isSendData) {
-      this._log(value + "682D")
       terminal.setCommand( value + "682D").then(() => {
         $('.led-length-label').val(value);
       });
@@ -440,7 +439,7 @@ function loadRGBSeg() {
 function rgbSegChangeEvent() {
   let value = $(this).val();
   if (isSendData){
-    this._log(value + "00003C");
+    // this._log(value + "00003C");
     terminal.setCommand(value + "00003C");
   }
 }
